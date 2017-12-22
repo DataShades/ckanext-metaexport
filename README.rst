@@ -5,37 +5,20 @@
 .. image:: https://travis-ci.org/DataShades/ckanext-metaexport.svg?branch=master
     :target: https://travis-ci.org/DataShades/ckanext-metaexport
 
-.. image:: https://coveralls.io/repos/DataShades/ckanext-metaexport/badge.svg
-  :target: https://coveralls.io/r/DataShades/ckanext-metaexport
-
-.. image:: https://pypip.in/download/ckanext-metaexport/badge.svg
-    :target: https://pypi.python.org/pypi//ckanext-metaexport/
-    :alt: Downloads
-
-.. image:: https://pypip.in/version/ckanext-metaexport/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-metaexport/
-    :alt: Latest Version
-
-.. image:: https://pypip.in/py_versions/ckanext-metaexport/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-metaexport/
-    :alt: Supported Python versions
-
-.. image:: https://pypip.in/status/ckanext-metaexport/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-metaexport/
-    :alt: Development Status
-
-.. image:: https://pypip.in/license/ckanext-metaexport/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-metaexport/
-    :alt: License
-
 =============
 ckanext-metaexport
 =============
 
-.. Put a description of your extension here:
-   What does it do? What features does it have?
-   Consider including some screenshots or embedding a video!
+`ckanext-metaexport` proviedes universal way to export dataset's metadata into different metadata standards.
 
+All formats should be registered before using. In order to do this, perform next steps:
+
+1. Implement `ckanext.metaexport.interfaces.IMetaexport` interface.
+2. Add `register_metadata_format`, that returns dictonary with format names as keys and FormatInstances as values.
+3. Add dataExtractors - method that provides function for generating data, that'll be passed into templates. It can be done via `register_data_extractors` method, that receives current formatters list and should pick desired format from collection and call `set_data_extractor` of this format. `set_data_extractor` expects to receive one argument - function, that will receive package_id and should return dictonary with template variables.
+5. In order to create your own format, you have to create class, inherited from `ckanext.metaexport.formatters.Format`
+
+All export views are available under `/dataset/{id}/metaexport/{format}` URL.
 
 ------------
 Requirements
@@ -94,6 +77,8 @@ do::
     cd ckanext-metaexport
     python setup.py develop
     pip install -r dev-requirements.txt
+
+
 
 
 -----------------

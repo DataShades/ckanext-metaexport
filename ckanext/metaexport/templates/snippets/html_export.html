@@ -1,0 +1,8 @@
+{% block export_html %}
+    <a href="{{ h.url_for(controller='ckanext.metaexport.controller:MetaexportController', action='export', id=pkg.id, format='html') }}" class="html-export-link" target="_blank" title="{% block html_export_title %}{{ 'Export metadata as HTML' }}{% endblock %}">
+    {% block html_link_text %}
+        {% set text = 'HTML'%}
+        {{ text }}
+    {% endblock %}
+    </a>
+{% endblock %}

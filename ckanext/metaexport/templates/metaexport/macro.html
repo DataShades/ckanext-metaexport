@@ -1,0 +1,266 @@
+{%- macro cs(text) %}
+  <gco:CharacterString>{{ text }}</gco:CharacterString>
+{% endmacro -%}
+
+{%- macro responsibleParty(org, position=None, role='None', with_contact=True, with_resource=True, short_resource=True, with_individual=True) %}
+  <gmd:CI_ResponsibleParty>
+
+    {% if with_individual %}
+      <gmd:individualName gco:nilReason="missing">
+    {{ cs(org.get('individualName', '')) }}
+      </gmd:individualName>
+    {% endif %}
+
+    <gmd:organisationName gco:nilReason="missing">
+      {{ cs(org.get('title') or (h.get_organization(org.get('org')) or {}).get('title') ) }}
+    </gmd:organisationName>
+
+    {% if position or org.get('position')  %}
+      <gmd:positionName gco:nilReason="missing">
+    {{ cs(position or org.get('position')) }}
+      </gmd:positionName>
+    {% endif %}
+
+    {% if with_contact %}
+      <gmd:contactInfo>
+    <gmd:CI_Contact>
+      {% if org.get('voice') or org.get('fax') %}
+            <gmd:phone>
+              <gmd:CI_Telephone>
+        {% if org.get('voice') %}
+          <gmd:voice>
+            {{ cs(org.get('voice')) }}
+          </gmd:voice>
+        {% endif %}
+        {% if org.get('fax') %}
+          <gmd:facsimile>
+            {{ cs(org.get('fax')) }}
+          </gmd:facsimile>
+        {% endif %}
+              </gmd:CI_Telephone>
+            </gmd:phone>
+      {% endif %}
+
+          <gmd:address>
+            <gmd:CI_Address>
+          <gmd:deliveryPoint gco:nilReason="missing">
+        {{ cs(org.get('delivery')) }}
+          </gmd:deliveryPoint>
+          <gmd:city gco:nilReason="missing">
+        {{ cs(org.get('city')) }}
+          </gmd:city>
+          <gmd:administrativeArea gco:nilReason="missing">
+        {{ cs(org.get('area')) }}
+          </gmd:administrativeArea>
+          <gmd:postalCode gco:nilReason="missing">
+        {{ cs(org.get('code')) }}
+          </gmd:postalCode>
+          <gmd:country gco:nilReason="missing">
+        {{ cs(org.get('country')) }}
+          </gmd:country>
+          <gmd:electronicMailAddress gco:nilReason="missing">
+        {{ cs(org.get('email')) }}
+          </gmd:electronicMailAddress>
+            </gmd:CI_Address>
+          </gmd:address>
+
+
+      {% if with_resource %}
+            <gmd:onlineResource>
+          <gmd:CI_OnlineResource>
+        {% if short_resource %}
+          <gmd:linkage/>
+          <gmd:protocol/>
+          <gmd:applicationProfile/>
+          <gmd:name/>
+          <gmd:description/>
+          <gmd:function/>
+        {% else %}
+          <gmd:linkage gco:nilReason="missing">
+                    <gmd:URL />
+          </gmd:linkage>
+                  <gmd:protocol gco:nilReason="missing">
+                    {{ cs() }}
+                  </gmd:protocol>
+                  <gmd:applicationProfile gco:nilReason="missing">
+                    {{ cs() }}
+                  </gmd:applicationProfile>
+                  <gmd:name gco:nilReason="missing">
+                    {{ cs() }}
+                  </gmd:name>
+                  <gmd:description gco:nilReason="missing">
+            {{ cs() }}
+                  </gmd:description>
+                  <gmd:function gco:nilReason="missing">
+                    <gmd:CI_OnLineFunctionCode
+              codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#CI_OnLineFunctionCode"
+              codeListValue="" />
+                  </gmd:function>
+        {% endif %}
+
+          </gmd:CI_OnlineResource>
+            </gmd:onlineResource>
+      {% endif %}
+
+    </gmd:CI_Contact>
+      </gmd:contactInfo>
+    {% endif %}
+
+    <gmd:role>
+      {% with role = (role or org.get('role'))[0].lower() + role[1:]  %}
+    <gmd:CI_RoleCode
+      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+      codeListValue="{{ role}}"/>
+    {% endwith %}
+    </gmd:role>
+  </gmd:CI_ResponsibleParty>
+
+{% endmacro -%}
+
+
+
+
+{%- macro citation(di) %}
+  <gmd:CI_Citation >
+
+    <gmd:title gco:nilReason="missing">
+      {{ cs(di.title) }}
+    </gmd:title>
+
+    <gmd:alternateTitle gco:nilReason="missing">
+      {{ cs(di.get('alternative_title'))  }}
+    </gmd:alternateTitle>
+
+
+    {% for date in di.dates %}
+      <gmd:date>
+        <gmd:CI_Date>
+          <gmd:date>
+        {% if date[0] %}
+              <gco:Date >
+                {{ h.render_datetime(date[0], '%Y-%m-%d')}}
+          </gco:Date>
+        {% endif %}
+          </gmd:date>
+          <gmd:dateType>
+            <gmd:CI_DateTypeCode
+              codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+              codeListValue="{{ date[1] }}">
+          {{ date[1] }}
+        </gmd:CI_DateTypeCode>
+          </gmd:dateType>
+        </gmd:CI_Date>
+      </gmd:date>
+    {% endfor %}
+
+    {% if di.get('with_edition') %}
+      <gmd:edition gco:nilReason="missing" >
+        {{ cs(di.get('edition')) }}
+      </gmd:edition>
+    {% endif %}
+
+    {% if di.get('with_edition') %}
+      <gmd:editionDate gco:nilReason="missing">
+        <gco:Date>
+      {{ h.render_datetime(di.get('edition_date'), '%Y-%m-%d')}}
+    </gco:Date>
+      </gmd:editionDate>
+    {% endif %}
+
+    {% if di.get('identifier') %}
+      <gmd:identifier>
+        <gmd:MD_Identifier>
+      {% if di.get('teamsite') %}
+            <gmd:authority>
+              <gmd:CI_Citation>
+                <gmd:title>
+                  {{ cs('Teamsite ID') }}
+                </gmd:title>
+                <gmd:date gco:nilReason="missing"/>
+              </gmd:CI_Citation>
+            </gmd:authority>
+      {% endif %}
+          <gmd:code gco:nilReason="missing">
+            {{ cs(di.identifier) }}
+          </gmd:code>
+        </gmd:MD_Identifier>
+      </gmd:identifier>
+    {% endif %}
+
+    {% if di.get('responsible') %}
+      <gmd:citedResponsibleParty>
+    {{ responsibleParty(with_resource=False, with_individual=False, **di.responsible) }}
+      </gmd:citedResponsibleParty>
+    {% endif %}
+
+    {% if di.get('presentation_form') %}
+      <gmd:presentationForm>
+        <gmd:CI_PresentationFormCode
+      codeList="http://www.ngdc.noaa.gov/metadata/published/xsd/schema/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode"
+      codeListValue="{{ di['presentation_form'] }}"/>
+      </gmd:presentationForm>
+    {% endif %}
+  </gmd:CI_Citation>
+{% endmacro -%}
+
+{%- macro report_result(report) %}
+  <gmd:result>
+    <gmd:DQ_ConformanceResult>
+      <gmd:specification>
+        <gmd:CI_Citation>
+          <gmd:title  gco:nilReason="missing">
+        {{ cs(report.title) }}
+          </gmd:title>
+          <gmd:date>
+            <gmd:CI_Date>
+              <gmd:date>
+        {% if report.date %}
+                  <gco:Date>
+            {{ h.render_datetime(report.date, '%Y-%m-%d')}}
+          </gco:Date>
+        {% endif %}
+              </gmd:date>
+              <gmd:dateType>
+        {% if report.type %}
+                  <gmd:CI_DateTypeCode
+            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+            codeListValue="{{ report.type }}">
+            {{ report.type }}
+          </gmd:CI_DateTypeCode>
+        {% endif %}
+              </gmd:dateType>
+            </gmd:CI_Date>
+          </gmd:date>
+        </gmd:CI_Citation>
+      </gmd:specification>
+      <gmd:explanation gco:nilReason="missing">
+        {{ cs(report.uid) }}
+      </gmd:explanation>
+      <gmd:pass/>
+    </gmd:DQ_ConformanceResult>
+  </gmd:result>
+{% endmacro -%}
+
+{%- macro legal_constraints() %}
+  <gmd:MD_LegalConstraints>
+    <gmd:useLimitation gco:nilReason="missing">
+      {{ cs(use_limitation ) }}
+    </gmd:useLimitation>
+    <gmd:accessConstraints>
+      <gmd:MD_RestrictionCode
+    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+    codeListValue="{{ restriction or 'otherRestrictions' }}"/>
+    </gmd:accessConstraints>
+    <gmd:useConstraints>
+      <gmd:MD_RestrictionCode
+    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"
+    codeListValue="{{ 'license' if restriction == 'license' and license_id else 'otherRestrictions' }}"/>
+    </gmd:useConstraints>
+    <gmd:otherConstraints gco:nilReason="missing">
+      {{ cs(other_constraints) }}
+    </gmd:otherConstraints>
+    <gmd:otherConstraints gco:nilReason="missing">
+      {{ cs(other_constraints_text) }}
+    </gmd:otherConstraints>
+  </gmd:MD_LegalConstraints>
+{% endmacro -%}

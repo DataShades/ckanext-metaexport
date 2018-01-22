@@ -1,0 +1,8 @@
+{% block export_gmd %}
+    <a href="{{ h.url_for(controller='ckanext.metaexport.controller:MetaexportController', action='export', id=pkg.id, format='gmd') }}" class="gmd-export-link" target="_blank" title="{% block gmd_export_title %}{{ 'Export metadata as ISO19139 XML' }}{% endblock %}">
+    {% block gmd_link_text %}
+        {% set text = 'ISO19139 XML'%}
+        {{ text }}
+    {% endblock %}
+    </a>
+{% endblock %}

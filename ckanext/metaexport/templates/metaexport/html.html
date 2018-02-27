@@ -675,7 +675,7 @@
     </tr>
     </tbody>
   </table>
-  {% if pkg_dict.get('lineage') %}
+  {% if pkg_dict.get('lineage') and not pkg_dict.get('geospatial_representation') == 'non_geospatial' %}
     <h1>Quality and validity</h1>
     <table>
       <thead>

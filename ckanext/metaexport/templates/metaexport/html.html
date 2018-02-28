@@ -7,10 +7,12 @@
     <meta name="DC.subject" scheme="eGMS.IPSV" content="metadata">
     <meta name="DC.language" scheme="DCTERMS.ISO639-2" content="{{ pkg_dict.get('language') or 'eng' }}">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,400italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{{g.site_url}}/base/vendor/font-awesome/css/font-awesome.min.css">
     <style>
     body {
     font-family: Arial,sans-serif;
     margin: 0px 30px;
+    position: relative;
     }
     h1, h2, h3, h4 {
     font-family: "Roboto Condensed",sans-serif;
@@ -77,9 +79,30 @@
     table tr.border-dot {
     border-bottom: 1px dotted #c4c4c4;
     }
+    .btn {
+    color: #000;
+    text-decoration: none;
+    background-color: #eaeaea;
+    border: 1px solid #c4c4c4;
+    padding: 5px 10px;
+    }
+    .btn:hover {
+    color: #567621;
+    }
+    .btn.print-btn {
+    position: absolute;
+    right: 0;
+    top: 8px;
+    }
+    @media print { 
+      .btn.print-btn {
+      display: none;
+      }
+    }
     </style>
   </head>
   <body>
+    <a href="javascript:window.print()" class="btn print-btn"><i class="icon-print"></i> Print</a>
     <h1>Identification</h1>
     <table>
       <thead>

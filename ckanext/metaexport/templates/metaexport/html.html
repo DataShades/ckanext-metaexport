@@ -340,7 +340,7 @@
           </td>
         </tr>
 
-        {% if pkg_dict.get('spatial_distance') %}
+        {% if pkg_dict.get('spatial_distance') and not pkg_dict.get('geospatial_representation') == 'non_geospatial' %}
           <tr class="bordered">
             <td><h2 title="Spatial resolution">Spatial resolution</h2></td>
             <td>

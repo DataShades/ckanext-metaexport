@@ -616,21 +616,6 @@
     </gmd:DQ_DataQuality>
   </gmd:dataQualityInfo>
 
-
-
-<!--   <gmd:portrayalCatalogueInfo>
-    <gmd:MD_PortrayalCatalogueReference>
-      <gmd:portrayalCatalogueCitation>
-        {{ m.citation({
-        'title': '',
-        'dates': [('1900-01-01', 'revision')],
-        'edition_date': '1900-01-01',
-        'alternative_title': '',
-        'with_edition': True
-        }) }}
-      </gmd:portrayalCatalogueCitation>
-    </gmd:MD_PortrayalCatalogueReference>
-  </gmd:portrayalCatalogueInfo> -->
   {% if pkg_dict.get('package_type') != 'report' %}
     <gmd:metadataConstraints >
       {{ m.legal_constraints() }}

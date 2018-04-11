@@ -56,7 +56,7 @@ def change_date_time_display(date_time, current_pattern, new_pattern):
 
 def metaex_right_year(date):
     time = ''
-    wrong_years = ['1901', '1900']
+    wrong_years = [1901, 1900]
     try:     
         time = datetime.strptime(
             date, "%Y-%m-%d")

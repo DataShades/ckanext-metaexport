@@ -211,7 +211,7 @@
           <gmd:title  gco:nilReason="missing">
         {{ cs(report.title) }}
           </gmd:title>
-          {% if not h.metaex_right_year(report.date) %}
+          {% if h.metaex_right_year(report.date) %}
             <gmd:date>
               <gmd:CI_Date>
                   <gmd:date>

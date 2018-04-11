@@ -211,26 +211,28 @@
           <gmd:title  gco:nilReason="missing">
         {{ cs(report.title) }}
           </gmd:title>
-          <gmd:date>
-            <gmd:CI_Date>
-              <gmd:date>
-        {% if report.date %}
-                  <gco:Date>
-            {{ h.render_datetime(report.date, '%Y-%m-%d')}}
-          </gco:Date>
-        {% endif %}
-              </gmd:date>
-              <gmd:dateType>
-        {% if report.type %}
-                  <gmd:CI_DateTypeCode
-            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
-            codeListValue="{{ report.type }}">
-            {{ report.type }}
-          </gmd:CI_DateTypeCode>
-        {% endif %}
-              </gmd:dateType>
-            </gmd:CI_Date>
-          </gmd:date>
+          {% if not h.metaex_wrong_year(report.date) %}
+            <gmd:date>
+              <gmd:CI_Date>
+                  <gmd:date>
+                    {% if report.date %}
+                      <gco:Date>
+                        {{ h.render_datetime(report.date, '%Y-%m-%d')}}
+                      </gco:Date>
+                    {% endif %}
+                  </gmd:date>
+                  <gmd:dateType>
+                    {% if report.type %}
+                      <gmd:CI_DateTypeCode
+                        codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode"
+                        codeListValue="{{ report.type }}">
+                        {{ report.type }}
+                      </gmd:CI_DateTypeCode>
+                    {% endif %}
+                  </gmd:dateType>
+              </gmd:CI_Date>
+            </gmd:date>
+          {% endif %}
         </gmd:CI_Citation>
       </gmd:specification>
       <gmd:explanation gco:nilReason="missing">

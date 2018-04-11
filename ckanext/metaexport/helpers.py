@@ -12,7 +12,7 @@ def get_helpers():
         dataset_references_dates=dataset_references_dates,
         change_date_time_display=change_date_time_display,
         meta_undump=json.loads,
-        metaex_wrong_year=metaex_wrong_year
+        metaex_right_year=metaex_right_year
     )
 
 
@@ -54,7 +54,7 @@ def change_date_time_display(date_time, current_pattern, new_pattern):
         current_pattern).strftime(new_pattern)
     return date_time
 
-def metaex_wrong_year(date):
+def metaex_right_year(date):
     time = ''
     wrong_years = ['1901', '1900']
     try:     

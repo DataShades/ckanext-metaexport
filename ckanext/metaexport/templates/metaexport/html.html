@@ -768,7 +768,7 @@
               <p>dataset</p>
             </td>
           </tr>
-          {% for report in reports if report.type and report.date and not h.metaex_wrong_year(report.date) or report.uid %}
+          {% for report in reports if report.type and report.date and h.metaex_right_year(report.date) or report.uid %}
             <tr class="bordered">
               <td colspan="2">
                 <h3>
@@ -776,7 +776,7 @@
                 </h3>
               </td>
             </tr>
-            {% if not h.metaex_wrong_year(report.date) %}
+            {% if h.metaex_right_year(report.date) %}
               {% if report.type %}
               <tr>
               <td><h4>Date type</h4></td>

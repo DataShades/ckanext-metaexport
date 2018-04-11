@@ -751,51 +751,55 @@
             </tr>
       </tbody>
     </table>
-
-    <h1>Data Quality</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="bordered">
-          <td><h3>Scope</h3></td>
-          <td>
-            <p>dataset</p>
-          </td>
-        </tr>
-        {% for report in reports if report.type or report.date or report.uid %}
+    
+    {% if reports %}
+      <h1>Data Quality</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
           <tr class="bordered">
-            <td colspan="2">
-              <h3>
-                {{ report.title }}
-              </h3>
-            </td>
-          </tr>
-          {% if report.type %}
-          <tr>
-          <td><h4>Date type</h4></td>
-          <td><p title="date type">{{ report.type }}</p></td>
-          </tr>
-          {% endif %}
-          {% if report.date %}
-          <tr>
-          <td><h4>Effective date</h4></td>
-          <td><p title="effective date">{{ h.change_date_time_display(report.date, '%Y-%m-%d', '%Y-%m-%d' ) }}</p></td>
-          </tr>
-          {% endif %}
-          <tr>
-          <td><h4>Explanation</h4></td>
+            <td><h3>Scope</h3></td>
             <td>
-              {{ report.uid }}
+              <p>dataset</p>
             </td>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          {% for report in reports if report.type and report.date and not h.metaex_wrong_year(report.date) or report.uid %}
+            <tr class="bordered">
+              <td colspan="2">
+                <h3>
+                  {{ report.title }}
+                </h3>
+              </td>
+            </tr>
+            {% if not h.metaex_wrong_year(report.date) %}
+              {% if report.type %}
+              <tr>
+              <td><h4>Date type</h4></td>
+              <td><p title="date type">{{ report.type }}</p></td>
+              </tr>
+              {% endif %}
+              {% if report.date %}
+              <tr>
+              <td><h4>Effective date</h4></td>
+              <td><p title="effective date">{{ h.change_date_time_display(report.date, '%Y-%m-%d', '%Y-%m-%d' ) }}</p></td>
+              </tr>
+              {% endif %}
+            {% endif %}
+            <tr>
+            <td><h4>Explanation</h4></td>
+              <td>
+                {{ report.uid }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
 
     <h1>Responsible organisations</h1>
       <table>

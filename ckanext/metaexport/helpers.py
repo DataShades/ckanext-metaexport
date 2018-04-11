@@ -12,6 +12,7 @@ def get_helpers():
         dataset_references_dates=dataset_references_dates,
         change_date_time_display=change_date_time_display,
         meta_undump=json.loads,
+        metaex_wrong_year=metaex_wrong_year
     )
 
 
@@ -52,3 +53,18 @@ def change_date_time_display(date_time, current_pattern, new_pattern):
         date_time,
         current_pattern).strftime(new_pattern)
     return date_time
+
+def metaex_wrong_year(date):
+    time = ''
+    wrong_years = ['1901', '1900']
+    try:     
+        time = datetime.strptime(
+            date, "%Y-%m-%d")
+    except Exception as e:
+        print e
+
+    if time:
+        year = time.year
+        if year not in wrong_years:
+            return True
+    return False

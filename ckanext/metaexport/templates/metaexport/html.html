@@ -469,48 +469,50 @@
           <h2 title="Geographic bounding box" >Geographic location</h2>
         </td>
       </tr>
-      {% set spatial_box = h.spatial_bound(pkg_dict.get('spatial')) %}
-      {% set minx,miny,maxx,maxy = spatial_box %}
-      <tr class="border-dot">
-        <td>
-          <h3>West bounding longitude</h3>
-        </td>
-        <td>
-          <p title="West bounding longitude">
-            {{ h.coordinate_format(minx) }}
-          </p>
-        </td>
-      </tr>
-      <tr class="border-dot">
-        <td>
-          <h3>East bounding longitude</h3>
-        </td>
-        <td>
-          <p title="East bounding longitude">
-            {{ h.coordinate_format(maxx) }}
-          </p>
-        </td>
-      </tr>
-      <tr class="border-dot">
-        <td>
-          <h3>North bounding latitude</h3>
-        </td>
-        <td>
-          <p title="North bounding latitude">
-            {{ h.coordinate_format(miny) }}
-          </p>
-        </td>
-      </tr>
-      <tr class="border-dot">
-        <td>
-          <h3>South bounding latitude</h3>
-        </td>
-        <td>
-          <p title="South bounding latitude">
-            {{ h.coordinate_format(maxy) }}
-          </p>
-        </td>
-      </tr>
+      {% if pkg_dict.get('spatial') %}
+        {% set spatial_box = h.spatial_bound(pkg_dict.get('spatial')) %}
+        {% set minx,miny,maxx,maxy = spatial_box %}
+        <tr class="border-dot">
+          <td>
+            <h3>West bounding longitude</h3>
+          </td>
+          <td>
+            <p title="West bounding longitude">
+              {{ h.coordinate_format(minx) }}
+            </p>
+          </td>
+        </tr>
+        <tr class="border-dot">
+          <td>
+            <h3>East bounding longitude</h3>
+          </td>
+          <td>
+            <p title="East bounding longitude">
+              {{ h.coordinate_format(maxx) }}
+            </p>
+          </td>
+        </tr>
+        <tr class="border-dot">
+          <td>
+            <h3>North bounding latitude</h3>
+          </td>
+          <td>
+            <p title="North bounding latitude">
+              {{ h.coordinate_format(miny) }}
+            </p>
+          </td>
+        </tr>
+        <tr class="border-dot">
+          <td>
+            <h3>South bounding latitude</h3>
+          </td>
+          <td>
+            <p title="South bounding latitude">
+              {{ h.coordinate_format(maxy) }}
+            </p>
+          </td>
+        </tr>
+      {% endif %}
       {% if pkg_dict.get('place_name') %}
         <tr>
           <td><h3>NSW Place Name</h3></td>

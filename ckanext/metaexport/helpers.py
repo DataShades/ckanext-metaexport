@@ -3,6 +3,8 @@ from dateutil.tz import tzlocal
 from datetime import datetime
 import json
 
+import ckan.logic as logic
+import ckan.model as model
 
 def get_helpers():
     return dict(
@@ -12,7 +14,8 @@ def get_helpers():
         dataset_references_dates=dataset_references_dates,
         change_date_time_display=change_date_time_display,
         meta_undump=json.loads,
-        metaex_right_year=metaex_right_year
+        metaex_right_year=metaex_right_year,
+        metaex_get_top_org=metaex_get_top_org
     )
 
 
@@ -68,3 +71,14 @@ def metaex_right_year(date):
         if year not in wrong_years:
             return True
     return False
+
+def metaex_get_top_org(org_id, show_full=False):
+    org = model.Group.get(org_id)
+    if org is not None:
+        parents = org.get_parent_group_hierarchy(type=org.type)
+        if parents:
+            parent = parents[0]
+            if show_full:
+                parent = logic.get_action('organization_show')(
+                    {}, {'id': parent.id})
+            return parent

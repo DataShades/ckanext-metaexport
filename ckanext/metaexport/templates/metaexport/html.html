@@ -8,100 +8,127 @@
     <meta name="DC.language" scheme="DCTERMS.ISO639-2" content="{{ pkg_dict.get('language') or 'eng' }}">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,400italic" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="{{g.site_url}}/base/vendor/font-awesome/css/font-awesome.min.css">
-    <style>
-    body {
-    font-family: Arial,sans-serif;
-    margin: 0px 30px;
-    position: relative;
-    }
-    h1, h2, h3, h4 {
-    font-family: "Roboto Condensed",sans-serif;
-    margin: 0px
-    }
-    h3, h4, h5 {
-    margin: 0px;
-    }
-    h1 {
-    font-size: 40px;
-    margin-top: 40px;
-    margin-bottom: 25px;
-    }
-    h2 {
-    font-size: 22px;
-    }
-    h3 {
-    font-size: 18px;
-    }
-    h4 {
-    font-size: 16px;
-    padding-left: 20px
-    }
-    p {
-    line-height: 1.2;
-    }
-    a {
-    color: #567621;
-    }
-    table {
-    border: 1px solid #c4c4c4;
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 10px
-    }
-    table thead th {
-    background: #eaeaea none repeat scroll 0 0;
-    color: #000;
-    font-family: "Roboto Condensed",sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 24px;
-    overflow: hidden;
-    padding: 10px 15px;
-    text-align: left;
-    }
-    table tbody td {
-    text-align: left;
-    padding: 10px 15px;
-    }
-    table thead th {
-    width: 64%;
-    }
-    table thead th:first-child {
-    width: 36%;
-    }
-    table tbody tr td:first-child {
-    vertical-align: top;
-    }
-    table tr.bordered,
-    table thead {
-    border-top: 1px solid #c4c4c4;
-    }
-    table tr.border-dot {
-    border-bottom: 1px dotted #c4c4c4;
-    }
-    .btn {
-    color: #000;
-    text-decoration: none;
-    background-color: #eaeaea;
-    border: 1px solid #c4c4c4;
-    padding: 5px 10px;
-    }
-    .btn:hover {
-    color: #567621;
-    }
-    .btn.print-btn {
-    position: absolute;
-    right: 0;
-    top: 8px;
-    }
-    @media print { 
-      .btn.print-btn {
-      display: none;
-      }
-    }
-    </style>
+    {% block html_styles %}
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0px 30px;
+          position: relative;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+          font-family: "Roboto Condensed", sans-serif;
+          margin: 0px
+        }
+
+        h3,
+        h4,
+        h5 {
+          margin: 0px;
+        }
+
+        h1 {
+          font-size: 40px;
+          margin-top: 40px;
+          margin-bottom: 25px;
+        }
+
+        h2 {
+          font-size: 22px;
+        }
+
+        h3 {
+          font-size: 18px;
+        }
+
+        h4 {
+          font-size: 16px;
+          padding-left: 20px
+        }
+
+        p {
+          line-height: 1.2;
+        }
+
+        a {
+          color: #567621;
+        }
+
+        table {
+          border: 1px solid #c4c4c4;
+          border-collapse: collapse;
+          width: 100%;
+          margin-bottom: 10px
+        }
+
+        table thead th {
+          background: #eaeaea none repeat scroll 0 0;
+          color: #000;
+          font-family: "Roboto Condensed", sans-serif;
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 24px;
+          overflow: hidden;
+          padding: 10px 15px;
+          text-align: left;
+        }
+
+        table tbody td {
+          text-align: left;
+          padding: 10px 15px;
+        }
+
+        table thead th {
+          width: 64%;
+        }
+
+        table thead th:first-child {
+          width: 36%;
+        }
+
+        table tbody tr td:first-child {
+          vertical-align: top;
+        }
+
+        table tr.bordered,
+        table thead {
+          border-top: 1px solid #c4c4c4;
+        }
+
+        table tr.border-dot {
+          border-bottom: 1px dotted #c4c4c4;
+        }
+
+        .btn {
+          color: #000;
+          text-decoration: none;
+          background-color: #eaeaea;
+          border: 1px solid #c4c4c4;
+          padding: 5px 10px;
+        }
+
+        .btn:hover {
+          color: #567621;
+        }
+
+        .btn.print-btn {
+          position: absolute;
+          right: 0;
+          top: 8px;
+        }
+
+        @media print {
+          .btn.print-btn {
+            display: none;
+          }
+        }
+      </style>
+    {% endblock %}
   </head>
-  <body>
+  <body class="{% block body_classes%}{% endblock %}">
     <a href="javascript:window.print()" class="btn print-btn"><i class="icon-print fa fa-print"></i> Print</a>
     <h1>Identification</h1>
     <table>

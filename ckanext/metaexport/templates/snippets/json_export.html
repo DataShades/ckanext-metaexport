@@ -1,5 +1,5 @@
 {% block export_json %}
-    <a href="{{ g.site_url }}/api/3/action/{{ h.url_for('package_show', id=pkg.id) }}" title="{% block json_export_title %}{{ 'Export metadata as JSON' }}{% endblock %}" target="_blank">
+    <a href="{{ h.url_for('/api/3/action/package_show', id=pkg.id) }}" title="{% block json_export_title %}{{ 'Export metadata as JSON' }}{% endblock %}" target="_blank">
     {% block json_link_text %}
         {% set text = 'JSON'%}
         {{ text }}

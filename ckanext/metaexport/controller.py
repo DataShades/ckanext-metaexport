@@ -1,15 +1,27 @@
 # -*- coding: utf-8 -*-
 
 import ckan.lib.base as base
-from ckan.common import response, _
-from ckanext.metaexport.helpers import metaex_get_top_org
+import ckan.model as model
+import ckan.plugins.toolkit as tk
+from ckan.common import response, _, c
 
-from .formatters import Formatter
+from ckanext.metaexport.formatters import Formatter
+from ckanext.metaexport.helpers import metaex_get_top_org
 
 
 class MetaexportController(base.BaseController):
-
     def export(self, id, format):
+        context = {'user': c.user, 'model': model}
+        try:
+            tk.check_access('package_show', context, {'id': id})
+        except tk.NotAuthorized:
+            return base.abort(
+                403,
+                _('Not authorized to read dataset %s in %s format') %
+                (id, format)
+            )
+        except tk.ObjectNotFound:
+            return base.abort(404, _('%s does not exist') % (id))
         try:
             fmt = Formatter.get(format)
         except NameError:

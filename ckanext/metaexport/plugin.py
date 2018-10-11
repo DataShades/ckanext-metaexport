@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from routes.mapper import SubMapper
-
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from routes.mapper import SubMapper
 
-from .interfaces import IMetaexport
-from .formatters import Formatter
-from .controller import MetaexportController
-
-from .formatters.gmd import GMD
-from .formatters.html_format import HTMLFormat
-
+from ckanext.metaexport.formatters import Formatter
+from ckanext.metaexport.formatters.gmd import GMD
+from ckanext.metaexport.formatters.html_format import HTMLFormat
+from ckanext.metaexport.formatters.dcat_rdf import DcatRdfFormat
+from ckanext.metaexport.formatters.dc_rdf import DcRdfFormat
+from ckanext.metaexport.interfaces import IMetaexport
 from ckanext.metaexport.helpers import get_helpers
 
 
@@ -47,12 +45,14 @@ class MetaexportPlugin(plugins.SingletonPlugin):
     # IMetaexport
 
     def register_metaexport_format(self):
-        return dict(
-            gmd=GMD(),
-            html=HTMLFormat()
-        )
+        return {
+            'gmd': GMD(),
+            'html': HTMLFormat(),
+            'dcat-rdf': DcatRdfFormat(),
+            'dc-rdf': DcRdfFormat()
+        }
 
-    #ITemplateHelpers
+    # ITemplateHelpers
 
     def get_helpers(self):
         return get_helpers()

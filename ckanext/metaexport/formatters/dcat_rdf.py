@@ -2,75 +2,38 @@
 
 import json
 
-from rdflib import Graph, Literal, URIRef, BNode
-from rdflib.namespace import Namespace, RDF, XSD, SKOS
+from rdflib import Literal, URIRef, BNode
+from rdflib.namespace import RDF, XSD, SKOS
 
 from geomet import wkt, InvalidGeoJSONException
 
-import ckan.lib.helpers as h
-from ckan.common import c
-import ckan.model as model
-import ckan.plugins.toolkit as tk
-from ckanext.metaexport.formatters import Format
+from ckanext.metaexport.formatters._rdf import RdfFormat
 from ckanext.metaexport.formatters.triple_helpers import (
-    get_date_triple, get_triple_from_dict, get_triples_from_dict,
-    get_list_triples_from_dict, publisher_uri_from_dataset_dict,
-    resource_uri, CleanedURIRef, add_mailto
+    get_date_triple,
+    get_triple_from_dict,
+    get_triples_from_dict,
+    get_list_triples_from_dict,
+    resource_uri,
+    CleanedURIRef,
+    add_mailto,
+    DCT,
+    DCAT,
+    ADMS,
+    VCARD,
+    FOAF,
+    SCHEMA,
+    LOCN,
+    GSP,
+    OWL,
+    SPDX,
+    GEOJSON_IMT,
 )
 
-DCT = Namespace("http://purl.org/dc/terms/")
-DCAT = Namespace("http://www.w3.org/ns/dcat#")
-ADMS = Namespace("http://www.w3.org/ns/adms#")
-VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
-FOAF = Namespace("http://xmlns.com/foaf/0.1/")
-SCHEMA = Namespace('http://schema.org/')
-TIME = Namespace('http://www.w3.org/2006/time')
-LOCN = Namespace('http://www.w3.org/ns/locn#')
-GSP = Namespace('http://www.opengis.net/ont/geosparql#')
-OWL = Namespace('http://www.w3.org/2002/07/owl#')
-SPDX = Namespace('http://spdx.org/rdf/terms#')
-GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'
 
-namespaces = {
-    'dct': DCT,
-    'dcat': DCAT,
-    'adms': ADMS,
-    'vcard': VCARD,
-    'foaf': FOAF,
-    'schema': SCHEMA,
-    'time': TIME,
-    'skos': SKOS,
-    'locn': LOCN,
-    'gsp': GSP,
-    'owl': OWL,
-    'spdx': SPDX,
-}
-
-
-def _bind_namespaces(g):
-    for k, v in namespaces.items():
-        g.bind(k, v)
-
-
-class DcatRdfFormat(Format):
-    _content_type = 'application/rdf+xml; charset=utf-8'
-    # _content_type = 'application/xml; charset=utf-8'
+class DcatRdfFormat(RdfFormat):
 
     def extract_data(self, id):
-        context = {'user': c.user, 'model': model}
-        dataset_dict = tk.get_action('package_show')(context, {'id': id})
-        dataset_url = h.url_for(
-            controller='package',
-            action='read',
-            id=dataset_dict['id'],
-            qualified=True
-        )
-
-        g = Graph()
-        _bind_namespaces(g)
-
-        dataset_ref = URIRef(dataset_url)
-        g.add((dataset_ref, RDF.type, DCAT.Dataset))
+        g = self._init_graph(id)
 
         # Basic fields
         items = [
@@ -85,13 +48,15 @@ class DcatRdfFormat(Format):
             ('dcat_type', DCT.type, None, Literal),
             ('provenance', DCT.provenance, None, Literal),
         ]
-        for triple in get_triples_from_dict(dataset_dict, dataset_ref, items):
+        for triple in get_triples_from_dict(
+            self._dataset_dict, self._dataset_ref, items
+        ):
             g.add(triple)
-        g.add((dataset_ref, DCAT.landingPage, URIRef(dataset_url)))
+        g.add((self._dataset_ref, DCAT.landingPage, URIRef(self._dataset_url)))
 
         # Tags
-        for tag in dataset_dict.get('tags', []):
-            g.add((dataset_ref, DCAT.keyword, Literal(tag['name'])))
+        for tag in self._dataset_dict.get('tags', []):
+            g.add((self._dataset_ref, DCAT.keyword, Literal(tag['name'])))
 
         # Dates
         items = [
@@ -99,7 +64,7 @@ class DcatRdfFormat(Format):
             ('modified', DCT.modified, ['metadata_modified'], Literal),
         ]
         for triple in get_triples_from_dict(
-            dataset_dict, dataset_ref, items, date_value=True
+            self._dataset_dict, self._dataset_ref, items, date_value=True
         ):
             g.add(triple)
 
@@ -118,13 +83,13 @@ class DcatRdfFormat(Format):
             ('sample', ADMS.sample, None, Literal),
         ]
         for triple in get_list_triples_from_dict(
-            dataset_dict, dataset_ref, items
+            self._dataset_dict, self._dataset_ref, items
         ):
             g.add(triple)
 
         # Contact details
         if any(
-            dataset_dict.get(field) for field in [
+            self._dataset_dict.get(field) for field in [
                 'contact_uri',
                 'contact_name',
                 'contact_email',
@@ -134,23 +99,23 @@ class DcatRdfFormat(Format):
                 'author_email',
             ]
         ):
-            contact_uri = dataset_dict.get('contact_uri')
+            contact_uri = self._dataset_dict.get('contact_uri')
             if contact_uri:
                 contact_details = CleanedURIRef(contact_uri)
             else:
                 contact_details = BNode()
 
             g.add((contact_details, RDF.type, VCARD.Organization))
-            g.add((dataset_ref, DCAT.contactPoint, contact_details))
+            g.add((self._dataset_ref, DCAT.contactPoint, contact_details))
 
             for triple in get_triple_from_dict(
-                dataset_dict, contact_details, VCARD.fn, 'contact_name',
+                self._dataset_dict, contact_details, VCARD.fn, 'contact_name',
                 ['maintainer', 'author']
             ):
                 g.add(triple)
             # Add mail address as URIRef, and ensure it has a mailto: prefix
             for triple in get_triple_from_dict(
-                dataset_dict,
+                self._dataset_dict,
                 contact_details,
                 VCARD.hasEmail,
                 'contact_email', ['maintainer_email', 'author_email'],
@@ -161,14 +126,16 @@ class DcatRdfFormat(Format):
 
         # Publisher
         if any(
-            dataset_dict.get(field) for field in [
+            self._dataset_dict.get(field) for field in [
                 'publisher_uri',
                 'publisher_name',
                 'organization',
             ]
         ):
 
-            publisher_uri = publisher_uri_from_dataset_dict(dataset_dict)
+            publisher_uri = publisher_uri_from_self._dataset_dict(
+                self._dataset_dict
+            )
             if publisher_uri:
                 publisher_details = CleanedURIRef(publisher_uri)
             else:
@@ -176,16 +143,16 @@ class DcatRdfFormat(Format):
                 publisher_details = BNode()
 
             g.add((publisher_details, RDF.type, FOAF.Organization))
-            g.add((dataset_ref, DCT.publisher, publisher_details))
+            g.add((self._dataset_ref, DCT.publisher, publisher_details))
 
-            publisher_name = dataset_dict.get('publisher_name')
-            if not publisher_name and dataset_dict.get('organization'):
-                publisher_name = dataset_dict['organization']['title']
+            publisher_name = self._dataset_dict.get('publisher_name')
+            if not publisher_name and self._dataset_dict.get('organization'):
+                publisher_name = self._dataset_dict['organization']['title']
 
             g.add((publisher_details, FOAF.name, Literal(publisher_name)))
             # TODO: It would make sense to fallback these to organization
             # fields but they are not in the default schema and the
-            # `organization` object in the dataset_dict does not include
+            # `organization` object in the self._dataset_dict does not include
             # custom fields
             items = [
                 ('publisher_email', FOAF.mbox, None, Literal),
@@ -194,13 +161,13 @@ class DcatRdfFormat(Format):
             ]
 
             for triple in get_triples_from_dict(
-                dataset_dict, publisher_details, items
+                self._dataset_dict, publisher_details, items
             ):
                 g.add(triple)
 
         # Temporal
-        start = dataset_dict.get('temporal_start')
-        end = dataset_dict.get('temporal_end')
+        start = self._dataset_dict.get('temporal_start')
+        end = self._dataset_dict.get('temporal_end')
         if start or end:
             temporal_extent = BNode()
 
@@ -211,12 +178,12 @@ class DcatRdfFormat(Format):
                 )
             if end:
                 g.add(get_date_triple(temporal_extent, SCHEMA.endDate, end))
-            g.add((dataset_ref, DCT.temporal, temporal_extent))
+            g.add((self._dataset_ref, DCT.temporal, temporal_extent))
 
         # Spatial
-        spatial_uri = dataset_dict.get('spatial_uri')
-        spatial_text = dataset_dict.get('spatial_text')
-        spatial_geom = dataset_dict.get('spatial')
+        spatial_uri = self._dataset_dict.get('spatial_uri')
+        spatial_text = self._dataset_dict.get('spatial_text')
+        spatial_geom = self._dataset_dict.get('spatial')
 
         if spatial_uri or spatial_text or spatial_geom:
             if spatial_uri:
@@ -225,7 +192,7 @@ class DcatRdfFormat(Format):
                 spatial_ref = BNode()
 
             g.add((spatial_ref, RDF.type, DCT.Location))
-            g.add((dataset_ref, DCT.spatial, spatial_ref))
+            g.add((self._dataset_ref, DCT.spatial, spatial_ref))
 
             if spatial_text:
                 g.add((spatial_ref, SKOS.prefLabel, Literal(spatial_text)))
@@ -249,11 +216,11 @@ class DcatRdfFormat(Format):
                     pass
 
         # Resources
-        for resource_dict in dataset_dict.get('resources', []):
+        for resource_dict in self._dataset_dict.get('resources', []):
 
             distribution = CleanedURIRef(resource_uri(resource_dict))
 
-            g.add((dataset_ref, DCAT.distribution, distribution))
+            g.add((self._dataset_ref, DCAT.distribution, distribution))
 
             g.add((distribution, RDF.type, DCAT.Distribution))
 

@@ -5,7 +5,7 @@ import datetime
 from dateutil.parser import parse as parse_date
 from urllib import quote
 
-from rdflib.namespace import XSD
+from rdflib.namespace import XSD, Namespace
 from rdflib import Literal, URIRef
 from ckantoolkit import config
 import ckan.model as model
@@ -13,6 +13,21 @@ import ckan.model as model
 log = logging.getLogger(__name__)
 
 PREFIX_MAILTO = u'mailto:'
+
+ADMS = Namespace("http://www.w3.org/ns/adms#")
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
+DCT = Namespace("http://purl.org/dc/terms/")
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
+GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'
+GSP = Namespace('http://www.opengis.net/ont/geosparql#')
+LOCN = Namespace('http://www.w3.org/ns/locn#')
+OWL = Namespace('http://www.w3.org/2002/07/owl#')
+SCHEMA = Namespace('http://schema.org/')
+SPDX = Namespace('http://spdx.org/rdf/terms#')
+VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+EML = Namespace('eml://ecoinformatics.org/eml-2.1.1')
+XS = Namespace('http://www.w3.org/2001/XMLSchema#')
 
 
 def get_date_triple(subject, predicate, value, _type=Literal):
@@ -255,6 +270,7 @@ class CleanedURIRef(object):
     will result in the exact same node type.
 
     '''
+
     @staticmethod
     def _careful_quote(value):
         # only encode this limited subset of characters to avoid more

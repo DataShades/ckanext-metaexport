@@ -1,0 +1,242 @@
+{% macro agent(data, tag) %}
+  {% for agent in data %}
+    <{{ tag }}>
+      {% if agent.individual_name %}
+	{% with ind = agent.individual_name %}
+	  <individualName>
+	    {% if ind.give_name %}
+	      <givenName>{{ ind.given_name }}</givenName>
+	    {% endif %}
+	    <surName>{{ ind.sur_name }}</surName>
+	  </individualName>
+	{% endwith %}
+      {% endif %}
+      {% if agent.organization_name %}
+	<organizationName>{{ agent.organization_name }}</organizationName>
+      {% endif %}
+      {% if agent.position_name %}
+	<positionName>{{ agent.position_name }}</positionName>
+      {% endif %}
+      {% if agent.address %}
+	{% with ad = agent.address %}
+	  <address>
+	    {% if ad.delivery_point %}
+	      <deliveryPoint>{{ ad.delivery_point }}</deliveryPoint>
+	    {% endif %}
+	    {% if ad.city %}
+	      <city>{{ ad.city }}</city>
+	    {% endif %}
+	    {% if ad.administrative_area %}
+	      <administrativeArea>{{ ad.administrative_area }}</administrativeArea>
+	    {% endif %}
+	    {% if ad.postal_code %}
+	      <postalCode>{{ ad.postal_code }}</postalCode>
+	    {% endif %}
+	    {% if ad.country %}
+	      <country>{{ ad.country }}NC</country>
+	    {% endif %}
+	  </address>
+	{% endwith %}
+      {% endif %}
+      {% if agent.electronic_mail_address %}
+	<electronicMailAddress>{{ agent.electronic_mail_address}}</electronicMailAddress>
+      {% endif %}
+      {% if agent.phone %}
+	<phone>{{ agent.phone }}</phone>
+      {% endif %}
+      {% if agent.online_url %}
+	<onlineUrl>{{ agent.online_url }}</onlineUrl>
+      {% endif %}
+      {% for id in agent.user_id|default([]) %}
+	<userId>{{ id }}</userId>
+      {% endfor %}
+      {% if agent.role %}
+	<role>{{ agent.role }}</role>
+      {% endif %}
+    </{{ tag }}>
+  {% endfor %}
+
+{% endmacro %}
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+         xmlns:dc="http://purl.org/dc/terms/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+         packageId="{{ data.id }}" system="http://gbif.org" scope="system"
+         xml:lang="eng">
+	 <dataset>
+	   {% for ai in data.alternate_identifier %}
+	     <alternateIdentifier>{{ ai }}</alternateIdentifier>
+	   {% endfor %}
+	   <title xml:lang="eng">{{ data.title }}</title>
+	   {{ agent(data['creator'], 'creator') }}
+	   {{ agent(data['metadata_provider'], 'metadataProvider') }}
+	   {{ agent(data.get('associated_party', []), 'associatedParty') }}
+	   <pubDate> {{ data.pub_date}} </pubDate>
+	   {% for lang in data.get('language', []) %}
+	     <language>{{ lang }}</language>
+	   {% endfor %}
+	   <abstract>
+	     <para>
+	       {{ h.render_markdown(data.notes) }}
+	     </para>
+	   </abstract>
+	   {% for ks in data.keyword_set %}
+	     <keywordSet>
+	       {% for keyword in ks.get('keyword', []) %}
+		 <keyword>{{ keyword }}</keyword>
+	       {% endfor %}
+               <keywordThesaurus>{{ ks.keyword_thesaurus }}</keywordThesaurus>
+	     </keywordSet>
+	   {% endfor %}
+	   {% if data.additional_info %}
+	     <additionalInfo>
+	       <para>
+		 {{ h.render_markdown(data.additional_info) }}
+	       </para>
+	     </additionalInfo>
+	   {% endif %}
+	   {% if data.intellectual_rights %}
+	     <intellectualRights>
+	       <para>
+		 {{ h.render_markdown(data.intellectual_rights) }}
+	       </para>
+	     </intellectualRights>
+	   {% endif %}
+	   {% if data.coverage %}
+	     <coverage>
+	       {% if data.coverage.geographic_coverage %}
+		 {% with cov = data.coverage.geographic_coverage %}
+		   <geographicCoverage>
+		     <geographicDescription>{{ cov.geographic_description }}</geographicDescription>
+		     <boundingCoordinates>
+		       <westBoundingCoordinate>{{ cov.bounding_coordinates.west_bounding_coordinate }}</westBoundingCoordinate>
+		       <eastBoundingCoordinate>{{ cov.bounding_coordinates.east_bounding_coordinate }}</eastBoundingCoordinate>
+		       <northBoundingCoordinate>{{ cov.bounding_coordinates.north_bounding_coordinate }}</northBoundingCoordinate>
+		       <southBoundingCoordinate>{{ cov.bounding_coordinates.south_bounding_coordinate }}</southBoundingCoordinate>
+		     </boundingCoordinates>
+		   </geographicCoverage>
+		 {% endwith %}
+	       {% endif %}
+	       {% if data.coverage.temporal_coverage %}
+		 {% with cov = data.coverage.temporal_coverage %}
+		   <temporalCoverage>
+		     {% if cov.range_of_dates %}
+		       <rangeOfDates>
+			 <beginDate>
+			   <calendarDate>{{ cov.range_of_dates.begin_date }}</calendarDate>
+			 </beginDate>
+			 <endDate>
+			   <calendarDate>{{ cov.range_of_dates.end_date }}</calendarDate>
+			 </endDate>
+		       </rangeOfDates>
+		     {% endif %}
+		     {% if cov.single_date_time %}
+		       <singleDateTime>
+			 <calendarDate>{{ cov.single_date_time }}</calendarDate>
+		       </singleDateTime>
+		     {% endif %}
+		   </temporalCoverage>
+		 {% endwith %}
+	       {% endif %}
+	       {% if data.coverage.taxonomic_coverage %}
+		 {% with cov = data.coverage.taxonomic_coverage %}
+		   <taxonomicCoverage>
+		     {% if cov.general_taxonomic_coverage %}
+		       <generalTaxonomicCoverage>{{ cov.general_taxonomic_coverage }}</generalTaxonomicCoverage>
+		     {% endif %}
+		     {% for tc in cov.taxonomic_classification|default([]) %}
+		       <taxonomicClassification>
+			 {% if tc.taxon_rank_name %}
+			   <taxonRankName>{{ tc.taxon_rank_name }}</taxonRankName>
+			 {% endif %}
+			 <taxonRankValue>{{ tc.taxon_rank_value }}</taxonRankValue>
+			 {% if tc.common_name %}
+			   <commonName>{{ tc.common_name }}</commonName>
+			 {% endif %}
+		       </taxonomicClassification>
+		     {% endfor %}
+		   </taxonomicCoverage>
+		 {% endwith %}
+	       {% endif %}
+	     </coverage>
+	   {% endif %}
+	   {% if data.purpose %}
+	     <purpose>
+	       <para>
+		 {{ h.render_markdown(data.purpose) }}
+	       </para>
+	     </purpose>
+	   {% endif %}
+	   {% if data.maintenance %}
+	     <maintenance>
+	       {% if data.maintenance.description %}
+		 <description>
+		   <para>
+		     {{ h.render_markdown(data.maintenance.description) }}
+		   </para>
+		 </description>
+	       {% endif %}
+	       <maintenanceUpdateFrequency>{{ data.maintenance.maintenance_update_requency }}</maintenanceUpdateFrequency>
+	     </maintenance>
+	   {% endif %}
+	   {{ agent(data['contact'], 'contact') }}
+	   {% for method in data.methods|default([]) %}
+	     <methods>
+               <methodStep>
+		 <description>
+		   <para>{{ h.render_markdown(method.method_step) }}</para>
+		 </description>
+               </methodStep>
+	       {% if method.sampling %}
+		 <sampling>
+		   <studyExtent>
+		     <description>
+		       <para>{{ h.render_markdown(method.sampling.study_extent) }}</para>
+		     </description>
+		   </studyExtent>
+		   <samplingDescription>
+		     <para>{{ h.render_markdown(method.sampling.sampling_description) }}</para>
+		   </samplingDescription>
+		 </sampling>
+	       {% endif %}
+	       {% if method.quality_control %}
+		 <qualityControl>
+		   <description>
+		     <para>{{ h.render_markdown(method.quatity_control) }}</para>
+		   </description>
+		 </qualityControl>
+	       {% endif %}
+	     </methods>
+	   {% endfor %}
+
+	   {% for project in data.project|default([]) %}
+	     <project {% if project.id  %}id="{{ project.id }}"{% endif %}>
+	       <title>{{ project.title }}</title>
+	       {% if data.personnel %}
+		 {{ agent(project.personnel.person, 'personnel') }}
+	       {% endif %}
+	       {% if project.abstract %}
+		 <abstract>
+		   <para>
+		     {{ h.render_markdown(project.abstract)}}
+		   </para>
+		 </abstract>
+	       {% endif %}
+	       {% if project.funding %}
+		 <funding>
+		   <para>
+		     {{ h.render_markdown(project.funding)}}
+		   </para>
+		 </funding>
+	       {% endif %}
+	       {% if project.design_description %}
+		 <designDescription>
+		   <para>
+		     {{ h.render_markdown(project.design_description)}}
+		   </para>
+		 </designDescription>
+	       {% endif %}
+	     </project>
+	   {% endfor %}
+	 </dataset>
+</eml:eml>

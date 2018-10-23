@@ -9,6 +9,7 @@ from geomet import wkt, InvalidGeoJSONException
 
 from ckanext.metaexport.formatters._rdf import RdfFormat
 from ckanext.metaexport.formatters.triple_helpers import (
+    publisher_uri_from_dataset_dict,
     get_date_triple,
     get_triple_from_dict,
     get_triples_from_dict,
@@ -133,7 +134,7 @@ class DcatRdfFormat(RdfFormat):
             ]
         ):
 
-            publisher_uri = publisher_uri_from_self._dataset_dict(
+            publisher_uri = publisher_uri_from_dataset_dict(
                 self._dataset_dict
             )
             if publisher_uri:

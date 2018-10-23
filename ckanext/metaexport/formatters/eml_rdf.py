@@ -9,16 +9,8 @@ from rdflib.namespace import RDF, XSD, SKOS, DC
 
 from ckanext.metaexport.formatters._rdf import RdfFormat
 from ckanext.metaexport.formatters.triple_helpers import (
-    get_triple_from_dict,
-    get_triples_from_dict,
-    get_list_triples_from_dict,
-    resource_uri,
-    CleanedURIRef,
-    LOCN,
-    GSP,
-    GEOJSON_IMT,
-    DCT,
-    XS,
+    get_triple_from_dict, get_triples_from_dict, get_list_triples_from_dict,
+    resource_uri, CleanedURIRef, LOCN, GSP, GEOJSON_IMT, DCT, XS, ADMS, DCAT
 )
 
 
@@ -84,7 +76,7 @@ class EmlRdfFormat(RdfFormat):
     def _keyword_set(self, data):
         result = BNode()
         for value in data.get('keyword'):
-            self.g.add((result, XS.keyword, Literal(value)))
+            self.g.add((result, DC.keyword, Literal(value)))
         self.g.add(
             (result, XS.keywordThesaurus, Literal(data['keyword_thesaurus']))
         )
@@ -251,13 +243,13 @@ class EmlRdfFormat(RdfFormat):
 
         # List fields
         items = (
-            ('alternate_identifier', XS.alternativeIdentifier, Literal),
-            ('creator', XS.creator, self._agent),
+            ('alternate_identifier', ADMS.identifier, Literal),
+            ('creator', DC.creator, self._agent),
             ('metadata_provider', XS.metadataProvider, self._agent),
             ('associated_party', XS.associatedParty, self._agent),
-            ('language', XS.language, Literal),
+            ('language', DCT.language, Literal),
             ('keyword_set', XS.keywordSet, self._keyword_set),
-            ('resources', XS.distribution, self._distribution),
+            ('resources', DCAT.distribution, self._distribution),
             ('coverage', XS.coverage, self._coverage),
             ('maintenance', XS.maintenance, self._maintenance),
             ('contact', XS.contact, self._agent),

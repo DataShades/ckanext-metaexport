@@ -11,7 +11,7 @@ from ckanext.metaexport.formatters.dcat_rdf import DcatRdfFormat
 from ckanext.metaexport.formatters.eml_rdf import EmlRdfFormat
 from ckanext.metaexport.formatters.dc_rdf import DcRdfFormat
 from ckanext.metaexport.formatters.eml_xml import EmlXmlFormat
-
+from ckanext.metaexport.formatters.anzlic_xml import AnzlicXmlFormat
 from ckanext.metaexport.interfaces import IMetaexport
 from ckanext.metaexport.helpers import get_helpers
 
@@ -55,6 +55,7 @@ class MetaexportPlugin(plugins.SingletonPlugin):
             'dc-rdf': DcRdfFormat(),
             'eml-rdf': EmlRdfFormat(),
             'eml-xml': EmlXmlFormat(),
+            'anzlic-xml': AnzlicXmlFormat(),
         }
 
     # ITemplateHelpers

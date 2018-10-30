@@ -1,0 +1,931 @@
+<?xml version="1.0" encoding="UTF-8"?>
+{% from "/metaexport/macro.html" import cs %}
+{% macro vector_representation(vector) %}
+  <gmd:MD_VectorSpatialRepresentation>
+    {% if vector.topology_level %}
+      <gmd:topologyLevel>
+	<gmd:MD_TopologyLevelCode codeList="{{ vector.topology_level.code_list }}" codeListValue="{{ vector.topology_level.code_list_value }}"/>
+      </gmd:topologyLevel>
+    {% endif %}
+    {% for obj in vector.geometric_objects|default([]) %}
+      <gmd:geometricObjects>
+	<gmd:MD_GeometricObjects>
+          <gmd:geometricObjectType>
+	    <gmd:MD_GeometricObjectTypeCode codeList="{{ obj.geometric_object_type.code_list }}" codeListValue="{{ obj.geometric_object_type.code_list_value }}"/>
+          </gmd:geometricObjectType>
+	  {% if obj.geometric_object_count %}
+            <gmd:geometricObjectCount><gco:Integer>{{ obj.geometric_object_count }}</gco:Integer></gmd:geometricObjectCount>
+	  {% endif %}
+	</gmd:MD_GeometricObjects>
+      </gmd:geometricObjects>
+    {% endfor %}
+  </gmd:MD_VectorSpatialRepresentation>
+{% endmacro %}
+{% macro grid_representation(grid) %}
+  <gmd:MD_GridSpatialRepresentation>
+    <gmd:numberOfDimensions>
+      <gco:Integer>{{ grid.number_of_dimensions }}</gco:Integer>
+    </gmd:numberOfDimensions>
+    {% for axis in grid.axis_dimension_properties|default([]) %}
+      <gmd:axisDimensionProperties>
+	<gmd:MD_Dimension>
+          <gmd:dimensionName>
+	    <gmd:MD_DimensionNameTypeCode codeList="{{ axis.dimension_name.code_list }}" codeListValue="{{ axis.dimension_name.code_list_value }}"/>
+	  </gmd:dimensionName>
+	  <gmd:dimensionSize>
+	    <gco:Integer>{{ axis.dimension_size }}</gco:Integer>
+	  </gmd:dimensionSize>
+	  {% if axis.resolution %}
+	    <gmd:resolution>
+	      <gco:Measure uom="">{{ axis.resolution }}</gco:Measure>
+	    </gmd:resolution>
+	  {% endif %}
+	</gmd:MD_Dimension>
+      </gmd:axisDimensionProperties>
+    {% endfor %}
+    <gmd:cellGeometry>
+      <gmd:MD_CellGeometryCode codeList="{{ grid.cell_geometry.code_list }}" codeListValue="{{ grid.cell_geometry.code_list_value }}"/>
+    </gmd:cellGeometry>
+    <gmd:transformationParameterAvailability>
+      <gco:Boolean>{{ 'true' if grid.transformation_parameter_availability else 'false' }}</gco:Boolean>
+    </gmd:transformationParameterAvailability>
+  </gmd:MD_GridSpatialRepresentation>
+{% endmacro %}
+{% macro responsible_party(contact) %}
+  <gmd:CI_ResponsibleParty>
+    {% if contact.individual_name %}
+      <gmd:individualName>
+        {{ cs(contact.individual_name) }}
+      </gmd:individualName>
+    {% endif %}
+    {% if contact.organisation_name %}
+      <gmd:organisationName>
+	{{ cs(contact.organisation_name) }}
+      </gmd:organisationName>
+    {% endif %}
+    {% if contact.position_name %}
+      <gmd:positionName>
+        {{ cs(contact.position_name) }}
+      </gmd:positionName>
+    {% endif %}
+    {% if contact.contact_info %}
+      <gmd:contactInfo>
+	<gmd:CI_Contact>
+	  {% if contact.contact_info.phone %}
+	    <gmd:phone>
+	      <gmd:CI_Telephone>
+		{% for voice in contact.contact_info.phone.voice|default([]) %}
+		  <gmd:voice>{{ cs(voice) }}</gmd:voice>
+		{% endfor %}
+		{% for facsimile in contact.contact_info.phone.facsimile|default([]) %}
+		  <gmd:facsimile>{{ cs(facsimile) }}</gmd:facsimile>
+		{% endfor %}
+	      </gmd:CI_Telephone>
+	    </gmd:phone>
+	  {% endif %}
+	  {% if contact.contact_info.address %}
+	    <gmd:address>
+	      <gmd:CI_Address>
+		{% for point in contact.contact_info.address.delivery_point|default([]) %}
+		  <gmd:deliveryPoint>{{ cs(point) }}</gmd:deliveryPoint>
+		{% endfor %}
+		{% if contact.contact_info.address.city %}
+		  <gmd:city>{{ cs(contact.contact_info.address.city) }}</gmd:city>
+		{% endif %}
+		{% if contact.contact_info.address.administrative_area %}
+		  <gmd:administrativeArea>{{ cs(contact.contact_info.address.administrative_area) }}</gmd:administrativeArea>
+		{% endif %}
+		{% if contact.contact_info.address.postal_code %}
+		  <gmd:postalCode>{{ cs(contact.contact_info.address.postal_code) }}</gmd:postalCode>
+		{% endif %}
+		{% if contact.contact_info.address.country %}
+		  <gmd:country>{{ cs(contact.contact_info.address.country) }}</gmd:country>
+		{% endif %}
+		{% for email in contact.contact_info.address.electronic_mail_address|default([]) %}
+		  <gmd:electronicMailAddress>{{ cs(email) }}</gmd:electronicMailAddress>
+		{% endfor %}
+	      </gmd:CI_Address>
+	    </gmd:address>
+	  {% endif %}
+	  {% if contact.contact_info.online_resource %}
+	    <gmd:onlineResource>
+	      {{ online(contact.contact_info.online_resource) }}
+	    </gmd:onlineResource>
+	  {% endif %}
+	  {% if contact.contact_info.hours_of_service %}
+	    <gmd:hoursOfService>{{ cs(contact.contact_info.hours_of_service) }}</gmd:hoursOfService>
+	  {% endif %}
+	  {% if contact.contact_info.contact_instructions %}
+	    <gmd:contactInstructions>{{ cs(contact.contact_info.contact_instructions) }}</gmd:contactInstructions>
+	  {% endif %}
+	</gmd:CI_Contact>
+      </gmd:contactInfo>
+    {% endif %}
+    {% if contact.role %}
+      <gmd:role>
+        <gmd:CI_RoleCode codeList="{{ contact.role.code_list }}" codeListValue="{{ contact.role.code_list_value }}"/>
+      </gmd:role>
+    {% endif %}
+  </gmd:CI_ResponsibleParty>
+{% endmacro %}
+{% macro online(res) %}
+  <gmd:CI_OnlineResource>
+    <gmd:linkage>
+      <gmd:URL>{{ res.linkage }}</gmd:URL>
+    </gmd:linkage>
+    {% if res.protocol %}
+      <gmd:protocol>{{ cs(res.protocol) }}</gmd:protocol>
+    {% endif %}
+    {% if res.application_profile %}
+      <gmd:applicationProfile>{{ cs(res.application_profile) }}</gmd:applicationProfile>
+    {% endif %}
+    {% if res.name %}
+      <gmd:name>{{ cs(res.name) }}</gmd:name>
+    {% endif %}
+    {% if res.description %}
+      <gmd:description>{{ cs(res.description) }}</gmd:description>
+    {% endif %}
+    {% if res.function %}
+      <gmd:function>
+	<gmd:CI_OnLineFunctionCode codeList="{{ res.function.code_list }}" codeListValue="{{ res.function.code_list_value }}"/>
+      </gmd:function>
+    {% endif %}
+  </gmd:CI_OnlineResource>
+{% endmacro %}
+{% macro citation(info) %}
+  <gmd:CI_Citation>
+    <gmd:title>{{ cs(info.title) }}</gmd:title>
+    {% for title in info.alternate_title %}
+      <gmd:alternateTitle>{{ cs(title) }}</gmd:alternateTitle>
+    {% endfor %}
+    {% for date in info.date %}
+      <gmd:date>
+	<gmd:CI_Date>
+	  <gmd:date>
+	    <gco:Date>{{ date.date }}</gco:Date>
+	  </gmd:date>
+	  <gmd:dateType>
+	    <gmd:CI_DateTypeCode codeList="{{ date.date_type.code_list }}" codeListValue="{{ date.date_type.code_list_value }}"/>
+	  </gmd:dateType>
+	</gmd:CI_Date>
+      </gmd:date>
+    {% endfor %}
+    {% if info.edition %}
+      <gmd:edition>{{ cs(info.edition) }}</gmd:edition>
+    {% endif %}
+    {% if info.edition_date %}
+      <gmd:editionDate>
+	<gco:Date>{{ info.edition_date }}</gco:Date>
+      </gmd:editionDate>
+    {% endif %}
+    {% for party in info.cited_responsible_party|default([]) %}
+      <gmd:citedResponsibleParty>
+	{{ responsible_party(party) }}
+      </gmd:citedResponsibleParty>
+    {% endfor %}
+    {% for form in info.presentation_form|default([]) %}
+      <gmd:presentationForm>
+	<gmd:CI_PresentationFormCode codeList="{{ form.code_list }}" codeListValue="{{ form.code_list_value }}"/>
+      </gmd:presentationForm>
+    {% endfor %}
+    {% if info.series %}
+      <gmd:series>
+	<gmd:CI_Series>
+	  {% if info.series.name %}
+	    <gmd:name>{{ cs(info.series.name) }}</gmd:name>
+	  {% endif %}
+	  {% if info.series.issue_identification %}
+	    <gmd:issueIdentification>{{ cs(info.series.issue_identification) }}</gmd:issueIdentification>
+	  {% endif %}
+	  {% if info.series.page %}
+	    <gmd:page>{{ cs(info.series.page) }}</gmd:page>
+	  {% endif %}
+	</gmd:CI_Series>
+      </gmd:series>
+    {% endif %}
+    {% if info.other_citation_details %}
+      <gmd:otherCitationDetails>{{ cs(info.other_citation_details) }}</gmd:otherCitationDetails>
+    {% endif %}
+    {% if info.collective_title %}
+      <gmd:collectiveTitle>{{ cs(info.collective_title) }}</gmd:collectiveTitle>
+    {% endif %}
+    {% if info.isbn %}
+      <gmd:ISBN>{{ cs(info.isbn) }}</gmd:ISBN>
+    {% endif %}
+    {% if info.issn %}
+      <gmd:ISSN>{{ cs(info.issn) }}</gmd:ISSN>
+    {% endif %}
+  </gmd:CI_Citation>
+{% endmacro %}
+{% macro offline(res) %}
+  <gmd:MD_Medium>
+    {% if res.name %}
+      <gmd:name>
+	<gmd:MD_MediumNameCode codeList="{{ res.name.code_list }}" codeListValue="{{ res.name.code_list_value }}"/>
+      </gmd:name>
+    {% endif %}
+    {% for dens in res.density|default([]) %}
+      <gmd:density>
+	<gco:Real>{{ dens }}</gco:Real>
+      </gmd:density>
+    {% endfor %}
+    {% if res.density_units %}
+      <gmd:densityUnits>{{ cs(res.density_units) }}</gmd:densityUnits>
+    {% endif %}
+    {% if res.volumes %}
+      <gmd:volumes>
+	<gco:Integer>{{ res.volumes }}</gco:Integer>
+      </gmd:volumes>
+    {% endif %}
+    {% for format in res.medium_format %}
+      <gmd:mediumFormat>
+	<gmd:MD_MediumFormatCode codeList="{{ format.code_list }}" codeListValue="{{ format.code_list_value }}"/>
+      </gmd:mediumFormat>
+    {% endfor %}
+    {% if res.medium_note %}
+      <gmd:mediumNote>{{ cs(res.medium_note) }}</gmd:mediumNote>
+  </gmd:MD_Medium>
+{% endif %}
+{% endmacro %}
+{% macro element_info(info) %}
+  <gmd:MD_ExtendedElementInformation>
+    <gmd:name>{{ cs(info.name) }}</gmd:name>
+    {% if info.short_name %}
+      <gmd:shortName>{{ cs(info.short_name) }}</gmd:shortName>
+    {% endif %}
+    {% if info.domain_code %}
+      <gmd:domainCode>
+	<gco:Integer>{{ info.domain_code }}</gco:Integer>
+      </gmd:domainCode>
+    {% endif %}
+    <gmd:definition>{{ cs(info.definition) }}</gmd:definition>
+    {% if info.obligation %}
+      <gmd:obligation>
+	<gmd:MD_ObligationCode>{{ info.obligation }}</gmd:MD_ObligationCode>
+      </gmd:obligation>
+    {% endif %}
+    {% if info.condition %}
+      <gmd:condition>{{ cs(info.condition) }}</gmd:condition>
+    {% endif %}
+    <gmd:dataType>
+      <gmd:MD_DatatypeCode codeList="{{ info.data_type.code_list }}" codeListValue="{{ info.data_type.code_list_value }}"/>
+    </gmd:dataType>
+    {% if info.maximum_occurrence %}
+      <gmd:maximumOccurrence>{{ cs(info.maximum_occurrence) }}</gmd:maximumOccurrence>
+    {% endif %}
+    {% if info.domain_value %}
+      <gmd:domainValue>{{ cs(info.domain_value) }}</gmd:domainValue>
+    {% endif %}
+    {% for parent in info.parent_entity %}
+      <gmd:parentEntity>{{ cs(parent) }}</gmd:parentEntity>
+    {% endfor %}
+    <gmd:rule>{{ cs(info.rule) }}</gmd:rule>
+    {% for rat in info.rationale|default([]) %}
+      <gmd:rationale>{{ cs(rat) }}</gmd:rationale>
+    {% endfor %}
+    {% for source in info.source %}
+      <gmd:source>{{ responsible_party(source) }}</gmd:source>
+    {% endfor %}
+  </gmd:MD_ExtendedElementInformation>
+{% endmacro %}
+{% macro identification(id) %}
+  <gmd:MD_DataIdentification>
+    <gmd:citation>{{ citation(id.identification.citation) }}</gmd:citation>
+    <gmd:abstract>{{ cs(id.identification.abstract) }}</gmd:abstract>
+    {% if id.identification.purpose %}
+      <gmd:purpose>{{ cs(id.identification.purpose) }}</gmd:purpose>
+    {% endif %}
+    {% for credit in id.identification.credit|default([]) %}
+      <gmd:credit>{{ cs(credit) }}</gmd:credit>
+    {% endfor %}
+    {% for status in id.identification.status %}
+      <gmd:status>
+	<gmd:MD_ProgressCode codeList="{{ status.code_list }}" codeListValue="{{ status.code_list_value }}"/>
+      </gmd:status>
+    {% endfor %}
+    {% for point in id.identification.point_of_contact|default([]) %}
+      <gmd:pointOfContact>
+	{{ responsible_party(point) }}
+      </gmd:pointOfContact>
+    {% endfor %}
+    {% for maint in id.identification.resource_maintenance|default([]) %}
+      <gmd:resourceMaintenance>
+	{{ maintenance(maint) }}
+      </gmd:resourceMaintenance>
+    {% endfor %}
+    {% for graphic in id.identification.graphic_overview|default([]) %}
+      <gmd:graphicOverview>
+	<gmd:MD_BrowseGraphic>
+	  <gmd:fileName>{{ cs(graphic.file_name) }}</gmd:fileName>
+	  {% if graphic.file_description %}
+	    <gmd:fileDescription>{{ cs(graphic.file_description) }}</gmd:fileDescription>
+	  {% endif %}
+	  {% if graphic.file_type %}
+	    <gmd:fileType>{{ cs(graphic.file_type) }}</gmd:fileType>
+	  {% endif %}
+	</gmd:MD_BrowseGraphic>
+      </gmd:graphicOverview>
+    {% endfor %}
+    {% for res in id.identification.resource_format|default([]) %}
+      <gmd:resourceFormat>
+	<gmd:MD_Format>
+	  <gmd:name>{{ cs(res.name) }}</gmd:name>
+	  <gmd:version>{{ cs(res.version) }}</gmd:version>
+	  {% if res.amendment_number %}
+	    <gmd:amendmentNumber>{{ cs(res.amendment_number) }}</gmd:amendmentNumber>
+	  {% endif %}
+	  {% if res.specification %}
+	    <gmd:specification>{{ cs(res.specification) }}</gmd:specification>
+	  {% endif %}
+	  {% if res.file_decompression_technique %}
+	    <gmd:fileDecompressionTechnique>{{ cs(res.file_decompression_technique) }}</gmd:fileDecompressionTechnique>
+	  {% endif %}
+	  {% for distro in res.format_distributor|default([]) %}
+	    <gmd:formatDistributor>
+	      <gmd:MD_Distributor>
+		<gmd:distributorContact>
+		  {{ responsible_party(distro.distributor_contact) }}
+		</gmd:distributorContact>
+		{% for process in distro.distribution_order_process|default([]) %}
+		  <gmd:distributionOrderProcess>
+		    <gmd:MD_StandardOrderProcess>
+		      {% if process.fees %}
+			<gmd:fees>{{ cs(process.fees) }}</gmd:fees>
+		      {% endif %}
+		      {% if process.planned_available_date_time %}
+			<gmd:plannedAvailableDateTime>
+			  <gco:DateTime>{{ cs(process.planned_available_date_time) }}</gco:DateTime>
+			</gmd:plannedAvailableDateTime>
+		      {% endif %}
+		      {% if process.ordering_instructions %}
+			<gmd:orderingInstructions>{{ cs(process.ordering_instructions) }}</gmd:orderingInstructions>
+		      {% endif %}
+		      {% if process.turnaround %}
+			<gmd:turnaround>{{ cs(process.turnaround) }}</gmd:turnaround>
+		      {% endif %}
+		    </gmd:MD_StandardOrderProcess>
+		  </gmd:distributionOrderProcess>
+		{% endfor %}
+		{% for transfer in distro.distributor_transfer_options|default([]) %}
+		  <gmd:distributorTransferOptions>
+		    <gmd:MD_DigitalTransferOptions>
+		      {% if transfer.units_of_distribution %}
+			<gmd:unitsOfDistribution>{{ cs(transfer.units_of_distribution) }}</gmd:unitsOfDistribution>
+		      {% endif %}
+		      {% if transfer.transfer_size %}
+			<gmd:transferSize>
+			  <gco:Real>{{ cs(transfer.transfer_size) }}</gco:Real>
+			</gmd:transferSize>
+		      {% endif %}
+		      {% for res in transfer.on_line %}
+			<gmd:onLine>{{ online(res) }}</gmd:onLine>
+		      {% endfor %}
+		      {% if transfer.off_line %}
+			<gmd:offLine>{{ offline(transfer.off_line) }}</gmd:offLine>
+		      {% endif %}
+		    </gmd:MD_DigitalTransferOptions>
+		  </gmd:distributorTransferOptions>
+		{% endfor %}
+	      </gmd:MD_Distributor>
+	    </gmd:formatDistributor>
+	  {% endfor %}
+	</gmd:MD_Format>
+      </gmd:resourceFormat>
+    {% endfor %}
+    {% for key in id.identification.descriptive_keywords|default([]) %}
+      <gmd:descriptiveKeywords>
+	<gmd:MD_Keywords>
+	  {% for k in key.keyword %}
+	    <gmd:keyword>{{ cs(k) }}</gmd:keyword>
+	  {% endfor %}
+	  {% if key.type %}
+	    <gmd:type>
+	      <gmd:MD_KeywordTypeCode codeList="{{ key.type.code_list }}" codeListValue="{{ key.type.code_list_value }}"/>
+	    </gmd:type>
+	  {% endif %}
+	  {% if key.thesaurus_name %}
+	    <gmd:thesaurusName>
+	      {{ citation(key.thesaurus_name) }}
+	    </gmd:thesaurusName>
+	  {% endif %}
+	</gmd:MD_Keywords>
+      </gmd:descriptiveKeywords>
+    {% endfor %}
+    {% for res in id.identification.resource_specific_usage|default([]) %}
+      <gmd:resourceSpecificUsage>
+	<gmd:MD_Usage>
+	  <gmd:specificUsage>{{ cs(res.specific_usage) }}</gmd:specificUsage>
+	  {% if res.usage_date_time %}
+	    <gmd:usageDateTime>
+	      <gco:DateTime>{{ res.usage_date_time }}</gco:DateTime>
+	    </gmd:usageDateTime>
+	  {% endif %}
+	  {% if res.user_determined_limitations %}
+	    <gmd:userDeterminedLimitations>{{ cs(res.user_determined_limitations) }}</gmd:userDeterminedLimitations>
+	  {% endif %}
+	  {% for contact in res.user_determined_limitations %}
+	    <gmd:userContactInfo>{{ responsible_party(contact) }}</gmd:userContactInfo>
+	  {% endfor %}
+	</gmd:MD_Usage>
+      </gmd:resourceSpecificUsage>
+    {% endfor %}
+    {% for constraint in id.identification.resource_constraints|default([]) %}
+      <gmd:resourceConstraints>
+	<gmd:MD_Constraints>
+	  <gmd:useLimitation>{{ cs(constraint) }}</gmd:useLimitation>
+	</gmd:MD_Constraints>
+      </gmd:resourceConstraints>
+    {% endfor %}
+    {% for info in id.identification.aggregation_info|default([]) %}
+      <gmd:aggregationInfo>
+	<gmd:MD_AggregateInformation>
+	  {% if info.aggregate_data_set_name %}
+	    <gmd:aggregateDataSetName>
+	      {{ citation(info.aggregate_data_set_name) }}
+	    </gmd:aggregateDataSetName>
+	  {% endif %}
+	  {% if info.aggregate_data_set_identifier %}
+	    <gmd:aggregateDataSetIdentifier>
+	      <gmd:MD_Identifier>
+		{% if info.aggregate_data_set_identifier.authority %}
+		  <gmd:authority>
+		    {{ citation(info.aggregate_data_set_identifier.authority) }}
+		  </gmd:authority>
+		{% endif %}
+		<gmd:code>
+		  {{ cs(info.aggregate_data_set_identifier.code) }}
+		</gmd:code>
+
+	      </gmd:MD_Identifier>
+	    </gmd:aggregateDataSetIdentifier>
+	  {% endif %}
+	  <gmd:associationType>
+	    <gmd:DS_AssociationTypeCode codeList="{{ info.association_type.code_list }}" codeListValue="{{ info.association_type.code_list_value }}"/>
+	  </gmd:associationType>
+	  {% if info.initiative_type %}
+	    <gmd:initiativeType>
+	      <gmd:DS_InitiativeTypeCode codeList="{{ info.initiative_type.code_list }}" codeListValue="{{ info.initiative_type.code_list_value }}"/>
+	    </gmd:initiativeType>
+	  {% endif %}
+	</gmd:MD_AggregateInformation>
+      </gmd:aggregationInfo>
+    {% endfor %}
+
+    {% for type in id.spatial_representation_type|default([]) %}
+      <gmd:spatialRepresentationType>
+	<gmd:MD_SpatialRepresentationTypeCode codeList="{{ type.code_list }}" codeListValue="{{ type.code_list_value }}"/>
+      </gmd:spatialRepresentationType>
+    {% endfor %}
+    {% for resolution in id.spatial_resolution|default([]) %}
+      <gmd:spatialResolution>
+	<gmd:MD_Resolution>
+	  <gmd:equivalentScale>
+	    <gmd:MD_RepresentativeFraction>
+              <gmd:denominator>
+		<gco:Integer>{{ resolution }}</gco:Integer>
+              </gmd:denominator>
+	    </gmd:MD_RepresentativeFraction>
+	  </gmd:equivalentScale>
+	</gmd:MD_Resolution>
+      </gmd:spatialResolution>
+    {% endfor %}
+    {% for lang in id.language %}
+      <gmd:language>{{ cs(lang) }}</gmd:language>
+    {% endfor %}
+    {% for char in id.character_set|default([]) %}
+      <gmd:characterSet>
+	<gmd:MD_CharacterSetCode codeList="{{ char.code_list }}" codeListValue="{{ char.code_list_value }}"/>
+      </gmd:characterSet>
+    {% endfor %}
+    {% for topic in id.topic_category|default([]) %}
+      <gmd:topicCategory>
+	<gmd:MD_TopicCategoryCode>{{ topic }}</gmd:MD_TopicCategoryCode>
+      </gmd:topicCategory>
+    {% endfor %}
+    {% if id.environment_description %}
+      <gmd:environmentDescription>{{ cs(id.environment_description) }}</gmd:environmentDescription>
+    {% endif %}
+    {% for ext in id.extent|default([]) %}
+      <gmd:extent>
+	{{ extent(ext) }}
+      </gmd:extent>
+    {% endfor %}
+    {% if id.supplemental_information %}
+      <gmd:supplementalInformation>{{ cs(id.supplemental_information) }}</gmd:supplementalInformation>
+    {% endif %}
+  </gmd:MD_DataIdentification>
+{% endmacro %}
+{% macro extent(ext) %}
+  <gmd:EX_Extent>
+    {% if ext.description %}
+      <gmd:description>{{ cs(ext.description) }}</gmd:description>
+    {% endif %}
+    {%if ext.geographic_element %}
+      <gmd:geographicElement>
+	<gmd:EX_GeographicBoundingBox>
+	  <gmd:extentTypeCode>
+	    <gco:Boolean>{{ 'true' if ext.geographic_element.extent_type_code else 'false' }}</gco:Boolean>
+	  </gmd:extentTypeCode>
+	  <gmd:westBoundLongitude>
+	    <gco:Decimal>{{ ext.geographic_element.bounding_box.west_bound_longitude }}</gco:Decimal>
+	  </gmd:westBoundLongitude>
+	  <gmd:eastBoundLongitude>
+	    <gco:Decimal>{{ ext.geographic_element.bounding_box.east_bound_longitude }}</gco:Decimal>
+	  </gmd:eastBoundLongitude>
+	  <gmd:southBoundLatitude>
+	    <gco:Decimal>{{ ext.geographic_element.bounding_box.south_bound_latitude }}</gco:Decimal>
+	  </gmd:southBoundLatitude>
+	  <gmd:northBoundLatitude>
+	    <gco:Decimal>{{ ext.geographic_element.bounding_box.north_bound_latitude }}</gco:Decimal>
+	  </gmd:northBoundLatitude>
+	</gmd:EX_GeographicBoundingBox>
+      </gmd:geographicElement>
+    {% endif %}
+    {% if ext.vertical_element %}
+      <gmd:verticalElement>
+	<gmd:EX_VerticalExtent>
+	  <gmd:minimumValue>
+	    <gco:Real>{{ ext.vertical_element.minimum_value }}</gco:Real>
+	  </gmd:minimumValue>
+	  <gmd:maximumValue>
+	    <gco:Real>{{ ext.vertical_element.maximum_value }}</gco:Real>
+	  </gmd:maximumValue>
+	</gmd:EX_VerticalExtent>
+      </gmd:verticalElement>
+    {% endif %}
+  </gmd:EX_Extent>
+{% endmacro %}
+{% macro lineage_source(source) %}
+  <gmd:LI_Source>
+    {% if source.description %}<gmd:description>{{ cs(source.description) }}</gmd:description>{% endif %}
+    {% if source.scale_denominator %}
+      <gmd:scaleDenominator>
+	<gmd:MD_RepresentativeFraction>
+          <gmd:denominator>...
+          </gmd:denominator>
+	</gmd:MD_RepresentativeFraction>
+      </gmd:scaleDenominator>
+    {% endif %}
+    {% if source.source_reference_system %}
+      <gmd:sourceReferenceSystem>
+	<gmd:MD_ReferenceSystem>
+          <gmd:referenceSystemIdentifier>
+	    <gmd:RS_Identifier>
+	      {% if source.source_reference_system.authority %}
+		<gmd:authority>
+		  {{ citation(source.source_reference_system.authority) }}
+		</gmd:authority>
+	      {% endif %}
+	      <gmd:code>
+		{{ cs(source.source_reference_system.code) }}
+	      </gmd:code>
+	    </gmd:RS_Identifier>
+          </gmd:referenceSystemIdentifier>
+	</gmd:MD_ReferenceSystem>
+      </gmd:sourceReferenceSystem>
+    {% endif %}
+    {% if source.source_citation %}
+      <gmd:sourceCitation>
+	{{ citation(source.source_citation) }}
+      </gmd:sourceCitation>
+    {% endif %}
+    {% if source.source_extent %}
+      <gmd:sourceExtent>
+	{{ extent(source.source_extent) }}
+      </gmd:sourceExtent>
+    {% endif %}
+  </gmd:LI_Source>
+{% endmacro %}
+{% macro maintenance(maint) %}
+  <gmd:MD_MaintenanceInformation>
+    <gmd:maintenanceAndUpdateFrequency>
+      <gmd:MD_MaintenanceFrequencyCode codeList="{{ maint.maintenance_and_update_frequency.code_list }}" codeListValue="{{ maint.maintenance_and_update_frequency.code_list_value }}"/>
+    </gmd:maintenanceAndUpdateFrequency>
+    {% if maint.date_of_next_update %}
+      <gmd:dateOfNextUpdate>
+	<gco:Date>{{ maint.date_of_next_update }}</gco:Date>
+      </gmd:dateOfNextUpdate>
+    {% endif %}
+    {% if maint.user_defined_maintenance_frequency %}
+      <gmd:userDefinedMaintenanceFrequency>
+	<gts:TM_PeriodDuration>{{ maint.user_defined_maintenance_frequency }}</gts:TM_PeriodDuration>
+      </gmd:userDefinedMaintenanceFrequency>
+    {% endif %}
+    {% for scope in maint.update_scope|default([]) %}
+      <gmd:updateScope>
+	<gmd:MD_ScopeCode codeList="{{ scope.code_list }}" codeListValue="{{ scope.code_list_value }}"/>
+      </gmd:updateScope>
+    {% endfor %}
+    {% for note in maint.maintenance_note %}
+      <gmd:maintenanceNote>{{ cs(note) }}</gmd:maintenanceNote>
+    {% endfor %}
+    {% for contact in maint.contact %}
+      <gmd:contact>{{ responsible_party(contact) }}</gmd:contact>
+    {% endfor %}
+  </gmd:MD_MaintenanceInformation>
+{% endmacro %}
+<gmd:MD_Metadata
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:geonet='http://www.fao.org/geonetwork'
+  xmlns:gco="http://www.isotc211.org/2005/gco"
+  xmlns:gmd="http://www.isotc211.org/2005/gmd"
+  xmlns:gts="http://www.isotc211.org/2005/gts"
+  xmlns:gsr="http://www.isotc211.org/2005/gsr"
+  xmlns:gss="http://www.isotc211.org/2005/gss"
+  xmlns:gmx="http://www.isotc211.org/2005/gmx"
+  xmlns:gml="http://www.opengis.net/gml"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.opengis.net/gml http://www.opengis.net/gml/gml.xsd http://www.w3.org/1999/xlink http://www.w3.org/1999/xlink/xlinks.xsd ">
+  <gmd:fileIdentifier>
+    {{ cs(data.id) }}
+  </gmd:fileIdentifier>
+  {% if data.language %}
+    <gmd:language>{{ cs(data.language) }}</gmd:language>
+  {% endif %}
+  {% if data.character_set %}
+    <gmd:characterSet>
+      <gmd:MD_CharacterSetCode
+	codeList="{{ data.character_set.code_list }}" codeListValue="{{ data.character_set.code_list_value }}"/>
+    </gmd:characterSet>
+  {% endif %}
+  {% if data.parent_identifier %}
+    <gmd:parentIdentifier>
+      {{ cs(data.parent_identifier) }}
+    </gmd:parentIdentifier>
+  {% endif %}
+  {% for level in data.hierarchy_level|default([]) %}
+    <gmd:hierarchyLevel>
+      <gmd:MD_ScopeCode codeList="{{ level.code_list }}" codeListValue="{{ level.code_list_value }}"/>
+    </gmd:hierarchyLevel>
+  {% endfor %}
+  {% for level in data.hierarchy_level_name|default([]) %}
+    <gmd:hierarchyLevelName>{{ cs(level) }}</gmd:hierarchyLevelName>
+  {% endfor %}
+
+  {% for contact in data.contact %}
+    <gmd:contact>
+      {{ responsible_party(contact) }}
+    </gmd:contact>
+  {% endfor %}
+  <gmd:dateStamp>
+    <gco:Date>{{ h.render_datetime(data.date_stamp, '%Y-%m-%d')}}</gco:Date>
+  </gmd:dateStamp>
+  {% if data.metadata_standard_name %}
+    <gmd:metadataStandardName>{{ cs(data.metadata_standard_name) }}</gmd:metadataStandardName>
+  {% endif %}
+  {% if data.metadata_standard_version %}
+    <gmd:metadataStandardVersion>{{ cs(data.metadata_standard_version) }}</gmd:metadataStandardVersion>
+  {% endif %}
+  <gmd:dataSetURI>
+    {{ cs(h.url_for(controller="package", action="read", id=data.id, qualified=True)) }}
+  </gmd:dataSetURI>
+  {% for locale in data.locale|default([]) %}
+    <gmd:locale>
+      <gmd:PT_Locale>
+	<gmd:languageCode>
+          <gmd:LanguageCode codeList="{{ locale.language_code.code_list }}" codeListValue="{{ locale.language_code.code_list_value }}"/>
+	</gmd:languageCode>
+	{% if locale.country %}
+	  <gmd:country>
+            <gmd:Country codeList="{{ locale.country.code_list }}" codeListValue="{{ locale.country.code_list_value }}"/>
+	  </gmd:country>
+	{% endif %}
+	{% if locale.character_encoding %}
+	  <gmd:characterEncoding>
+            <gmd:MD_CharacterSetCode codeList="{{ locale.character_encoding.code_list }}" codeListValue="{{ locale.character_encoding.code_list_value }}"/>
+	  </gmd:characterEncoding>
+	{% endif %}
+      </gmd:PT_Locale>
+    </gmd:locale>
+  {% endfor %}
+  {% for spatial in data.spatial_representation_info|default([]) %}
+    <gmd:spatialRepresentationInfo>
+      {% if spatial.vector %}
+	{{ vector_representation(spatial.vector) }}
+      {% elif spatial.grid %}
+	{{ grid_representation(spatial.grid) }}
+      {% endif %}
+    </gmd:spatialRepresentationInfo>
+  {% endfor %}
+  {% for ref in data.reference_system_info|default([]) %}
+    <gmd:referenceSystemInfo>
+      <gmd:MD_ReferenceSystem>
+	<gmd:referenceSystemIdentifier>
+	  <gmd:RS_Identifier>
+	    {% if ref.authority %}
+	      <gmd:authority>
+		{{ citation(ref.authority) }}
+	      </gmd:authority>
+	    {% endif %}
+	    <gmd:code>
+	      {{ cs(ref.code) }}
+	    </gmd:code>
+	  </gmd:RS_Identifier>
+	</gmd:referenceSystemIdentifier>
+      </gmd:MD_ReferenceSystem>
+    </gmd:referenceSystemInfo>
+  {% endfor %}
+  {% for ext in data.metadata_extension_info|default([]) %}
+    <gmd:metadataExtensionInfo>
+      <gmd:MD_MetadataExtensionInformation>
+	{% if ext.extension_on_line_resource %}
+	  <gmd:extensionOnLineResource>
+	    {{ online(ext.extension_on_line_resource) }}
+	  </gmd:extensionOnLineResource>
+	{% endif %}
+	{% for info in ext.extended_element_information|default([]) %}
+	  <gmd:extendedElementInformation>{{ element_info(info) }}</gmd:extendedElementInformation>
+	{% endfor %}
+      </gmd:MD_MetadataExtensionInformation>
+    </gmd:metadataExtensionInfo>
+  {% endfor %}
+  {% for id in data.identification_info %}
+    <gmd:identificationInfo>
+      {{ identification(id) }}
+    </gmd:identificationInfo>
+  {% endfor %}
+  {% for info in data.content_info|default([]) if info.coverage_description %}
+    <gmd:contentInfo>
+      <gmd:MD_CoverageDescription>
+	<gmd:attributeDescription>
+	  <gco:RecordType>{{ info.coverage_description.attribute_description }}</gco:RecordType>
+	</gmd:attributeDescription>
+	<gmd:contentType>
+	  <gmd:MD_CoverageContentTypeCode codeList="{{ info.coverage_description.content_type.code_list }}" codeListValue="{{ info.coverage_description.content_type.code_list_value }}"/>
+	</gmd:contentType>
+	{% for dimension in info.coverage_description.dimension %}
+	  <gmd:dimension>
+	    <gmd:MD_RangeDimension>
+	      <gmd:sequenceIdentifier>
+		<gco:MemberName>
+		  <gco:aName>{{ dimension.sequence_identifier }}</gco:aName>
+		</gco:MemberName>
+	      </gmd:sequenceIdentifier>
+	      <gmd:descriptor>{{ cs(dimension.descriptor) }}</gmd:descriptor>
+	    </gmd:MD_RangeDimension>
+	  </gmd:dimension>
+	{% endfor %}
+      </gmd:MD_CoverageDescription>
+    </gmd:contentInfo>
+  {% endfor %}
+  {% for dqt in data.data_quality_info|default([]) %}
+    <gmd:dataQualityInfo>
+      <gmd:DQ_DataQuality>
+	<gmd:scope>
+	  <gmd:DQ_Scope>
+	    <gmd:level>
+	      <gmd:MD_ScopeCode codeList="{{ dqt.scope.level.code_list }}" codeListValue="{{ dqt.scope.level.code_list_value }}"/>
+	    </gmd:level>
+	    {% if dqt.scope.extent %}
+	      <gmd:extent>{{ extent(dqt.scope.extent) }}</gmd:extent>
+	    {% endif %}
+	  </gmd:DQ_Scope>
+	</gmd:scope>
+	{% for report in dqt.report %}
+	  <gmd:report>
+	    <gmd:DQ_TemporalValidity>
+	      {% for name in report.name_of_measure|default([]) %}
+		<gmd:nameOfMeasure>{{ cs(name) }}</gmd:nameOfMeasure>
+	      {% endfor %}
+	      {% if report.measure_identification %}
+		<gmd:measureIdentification>
+		  <gmd:MD_Identifier>
+		    {% if report.authority %}
+		      <gmd:authority>
+			{{ citation(report.measure_identification.authority) }}
+		      </gmd:authority>
+		    {% endif %}
+		    <gmd:code>
+		      {{ cs(report.measure_identification.code) }}
+		    </gmd:code>
+		  </gmd:MD_Identifier>
+		</gmd:measureIdentification>
+	      {% endif %}
+	      {% if report.measure_description %}
+		<gmd:measureDescription>{{ cs(report.measure_description) }}</gmd:measureDescription>
+	      {% endif %}
+	      {% if report.evaluation_method_type  %}
+		<gmd:evaluationMethodType>
+		  <gmd:DQ_EvaluationMethodTypeCode codeList="{{ report.evaluation_method_type.code_list }}" codeListValue="{{ report.evaluation_method_type.code_list_value }}"/>
+		</gmd:evaluationMethodType>
+	      {% endif %}
+	      {% if report.evaluation_method_description %}
+		<gmd:evaluationMethodDescription>{{ cs(report.evaluation_method_description) }}</gmd:evaluationMethodDescription>
+	      {% endif %}
+	      {% if report.evaluation_procedure %}
+		<gmd:evaluationProcedure>{{ citation(report.evaluation_procedure) }}</gmd:evaluationProcedure>
+	      {% endif %}
+	      {% for date in report.date_time %}
+		<gmd:dateTime>
+		  <gco:DateTime>{{ date }}</gco:DateTime>
+		</gmd:dateTime>
+	      {% endfor %}
+	      <gmd:result>
+		<gmd:DQ_ConformanceResult>
+		  {% if report.result.specification %}
+		    <gmd:specification>
+		      {{ citation(report.result.specification) }}
+		    </gmd:specification>
+		  {% endif %}
+		  {% if report.result.explanation %}
+		    <gmd:explanation>{{ cs(report.result.explanation) }}</gmd:explanation>
+		  {% endif %}
+		  <gmd:pass>
+		    <gco:Boolean>{{ 'true' if report.result['pass'] else 'false' }}</gco:Boolean>
+		  </gmd:pass>
+		</gmd:DQ_ConformanceResult>
+	      </gmd:result>
+	    </gmd:DQ_TemporalValidity>
+	  </gmd:report>
+	{% endfor %}
+	{% if dqt.lineage %}
+	  <gmd:lineage>
+	    <gmd:LI_Lineage>
+	      {% if dqt.lineage.statement %}
+		<gmd:statement>{{ cs(dqt.lineage.statement) }}</gmd:statement>
+	      {% endif %}
+	      {% for step in dqt.lineage.process_step|default([]) %}
+		<gmd:processStep>
+		  <gmd:LI_ProcessStep>
+		    <gmd:description>{{ cs(step.description) }}</gmd:description>
+		    {% if step.rationale %}
+		      <gmd:rationale>{{ cs(step.rationale) }}</gmd:rationale>
+		    {% endif %}
+		    {% if step.date_time %}
+		      <gmd:dateTime>
+			<gco:DateTime>{{ step.date_time }}</gco:DateTime>
+		      </gmd:dateTime>
+		    {% endif %}
+		    {% if step.processor %}
+		      <gmd:processor>{{ responsible_party(step.processor) }}</gmd:processor>
+		    {% endif %}
+		    {% if step.source %}
+		      <gmd:source>
+			{{ lineage_source(step.source) }}
+		      </gmd:source>
+		    {% endif %}
+		  </gmd:LI_ProcessStep>
+		</gmd:processStep>
+	      {% endfor %}
+	      {% for source in dqt.lineage.source|default([]) %}
+		<gmd:source>
+		  {{ lineage_source(source) }}
+		</gmd:source>
+	      {% endfor %}
+	    </gmd:LI_Lineage>
+	  </gmd:lineage>
+	{% endif %}
+      </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
+  {% endfor %}
+  {% for catalogue in data.portrayal_catalogue_info|default([]) %}
+    <gmd:portrayalCatalogueInfo>
+      <gmd:MD_PortrayalCatalogueReference>
+	<gmd:portrayalCatalogueCitation>
+          {{ citation(catalogue) }}
+	</gmd:portrayalCatalogueCitation>
+      </gmd:MD_PortrayalCatalogueReference>
+    </gmd:portrayalCatalogueInfo>
+  {% endfor %}
+  {% for cons in data.metadata_constraints|default([]) %}
+    <gmd:metadataConstraints>
+      <gmd:MD_Constraints>
+	{% for lim in cons.use_limitations %}
+	  <gmd:useLimitation>{{ cs(lim) }}</gmd:useLimitation>
+	{% endfor %}
+      </gmd:MD_Constraints>
+    </gmd:metadataConstraints>
+  {% endfor %}
+  {% for schema in data.application_schema_info|default([]) %}
+    <gmd:applicationSchemaInfo>
+      <gmd:MD_ApplicationSchemaInformation>
+	<gmd:name>
+	  {{ citation(schema.name) }}
+	</gmd:name>
+	<gmd:schemaLanguage>{{ cs(schema.schema_language) }}</gmd:schemaLanguage>
+	<gmd:constraintLanguage>{{ cs(schema.constraint_language) }}</gmd:constraintLanguage>
+	{% if schema.schema_ascii %}
+	  <gmd:schemaAscii>{{ cs(schema.schema_ascii) }}</gmd:schemaAscii>
+	{% endif %}
+	{% if schema.graphics_file %}
+	  <gmd:graphicsFile>
+            <gco:Binary>{{ schema.graphics_file }}</gco:Binary>
+	  </gmd:graphicsFile>
+	{% endif %}
+	{% if schema.software_development_file %}
+	  <gmd:softwareDevelopmentFile>
+            <gco:Binary>{{ schema.software_development_file }}</gco:Binary>
+	  </gmd:softwareDevelopmentFile>
+	{% endif %}
+	{% if schema.software_development_file_format %}
+	  <gmd:softwareDevelopmentFileFormat>{{ cs(schema.software_development_file_format) }}</gmd:softwareDevelopmentFileFormat>
+	{% endif %}
+      </gmd:MD_ApplicationSchemaInformation>
+    </gmd:applicationSchemaInfo>
+  {% endfor %}
+  {% if data.metadata_maintenance %}
+    <gmd:metadataMaintenance>
+      {{ maintenance(data.metadata_maintenance) }}
+    </gmd:metadataMaintenance>
+  {% endif %}
+</gmd:MD_Metadata>

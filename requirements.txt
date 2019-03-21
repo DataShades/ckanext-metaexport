@@ -1,3 +1,4 @@
 rdflib==4.2.2
 ckantoolkit==0.0.4
 geomet==0.2.0.post2
+pdfkit==0.6.1

@@ -39,6 +39,6 @@ class MetaexportController(base.BaseController):
                     data['owner_org'] = org
         except Exception as e:
             print e
-        return base.render(
+        return fmt.render(
             'metaexport/{}.html'.format(format), extra_vars=data
         )

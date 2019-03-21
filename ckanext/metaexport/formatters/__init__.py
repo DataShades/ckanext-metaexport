@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import ckan.lib.base as base
 
 def _default_data_extractor(pkg_id):
     return dict(
@@ -53,3 +53,6 @@ class Format(object):
 
     def set_data_extractor(self, func):
         self._data_extractor = func
+
+    def render(self, template, *args, **kwargs):
+        return base.render(template, *args, **kwargs)

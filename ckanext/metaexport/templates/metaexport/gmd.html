@@ -591,7 +591,7 @@
             {% for report in reports if report.type or report.date or report.uid %}
                 <gmd:report>
                     <gmd:DQ_{{ report.title|replace(' ', '')}}>
-                        {{ m.report_result(h.metaex_clean_html(h.render_markdown(report))) }}
+                        {{ m.report_result(report) }}
                     </gmd:DQ_{{ report.title|replace(' ', '')}}>
                 </gmd:report>
             {% endfor %}

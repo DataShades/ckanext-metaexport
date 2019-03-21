@@ -3,6 +3,8 @@ from dateutil.tz import tzlocal
 from datetime import datetime
 import json
 
+from bleach import clean as bleach_clean
+
 import ckan.logic as logic
 import ckan.model as model
 
@@ -15,7 +17,8 @@ def get_helpers():
         change_date_time_display=change_date_time_display,
         meta_undump=json.loads,
         metaex_right_year=metaex_right_year,
-        metaex_get_top_org=metaex_get_top_org
+        metaex_get_top_org=metaex_get_top_org,
+        metaex_clean_html=metaex_clean_html,
     )
 
 
@@ -60,7 +63,7 @@ def change_date_time_display(date_time, current_pattern, new_pattern):
 def metaex_right_year(date):
     time = ''
     wrong_years = [1901, 1900]
-    try:     
+    try:
         time = datetime.strptime(
             date, "%Y-%m-%d")
     except Exception as e:
@@ -82,3 +85,7 @@ def metaex_get_top_org(org_id, show_full=False):
                 parent = logic.get_action('organization_show')(
                     {}, {'id': parent.id})
             return parent
+
+
+def metaex_clean_html(text):
+    return bleach_clean(text, tags=[], strip=True)

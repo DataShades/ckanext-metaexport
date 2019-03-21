@@ -2,632 +2,632 @@
 {% import "/metaexport/macro.html" as m with context %}
 
 <gmd:MD_Metadata
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:geonet='http://www.fao.org/geonetwork'
-  xmlns:gco="http://www.isotc211.org/2005/gco"
-  xmlns:gmd="http://www.isotc211.org/2005/gmd"
-  xmlns:gts="http://www.isotc211.org/2005/gts"
-  xmlns:gsr="http://www.isotc211.org/2005/gsr"
-  xmlns:gss="http://www.isotc211.org/2005/gss"
-  xmlns:gmx="http://www.isotc211.org/2005/gmx"
-  xmlns:gml="http://www.opengis.net/gml"
-  xmlns:xlink="http://www.w3.org/1999/xlink"
-  xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.opengis.net/gml http://www.opengis.net/gml/gml.xsd http://www.w3.org/1999/xlink http://www.w3.org/1999/xlink/xlinks.xsd ">
-  <gmd:fileIdentifier gco:nilReason="missing">
-    {{ m.cs(pkg_dict.id) }}
-  </gmd:fileIdentifier>
-  <gmd:language>
-    <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="{{ language }}" />
-  </gmd:language>
-  <gmd:characterSet>
-    <gmd:MD_CharacterSetCode
-      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharactersetCode" codeListValue="UTF-8"/>
-  </gmd:characterSet>
-  <gmd:parentIdentifier gco:nilReason="missing">
-    {% if pkg_dict.parent_id %}
-      {{ m.cs('{' + pkg_dict.parent_id + '}') }}
-    {% endif %}
-  </gmd:parentIdentifier>
-  <gmd:contact>
-    {{ m.responsibleParty(owner_org, role='Distributor', position='Data Broker',with_individual=False) }}
-  </gmd:contact>
-  <gmd:dateStamp>
-    <gco:Date>
-      {{ h.render_datetime(date_stamp, '%Y-%m-%d')}}
-    </gco:Date>
-  </gmd:dateStamp>
-  <gmd:metadataStandardName gco:nilReason="missing">
-    {{ m.cs('ANZLIC Metadata Profile: An Australian/New Zealand Profile of AS/NZS ISO 19115:2005, Geographic information - Metadata' ) }}
-  </gmd:metadataStandardName>
-  <gmd:metadataStandardVersion gco:nilReason="missing">
-    {{ m.cs('1.1') }}
-  </gmd:metadataStandardVersion>
-  <gmd:dataSetURI gco:nilReason="missing">
-    {{ m.cs(h.url_for(controller="package", action="read", id=pkg_dict.id, qualified=True)) }}
-  </gmd:dataSetURI>
-  {% if pkg_dict.geospatial_representation == 'vector' %}
-    <gmd:spatialRepresentationInfo>
-      <gmd:MD_VectorSpatialRepresentation>
-        <gmd:geometricObjects>
-          <gmd:MD_GeometricObjects>
-	    {% if not pkg_dict.spatial_geo_type %}
-	      <gmd:geometricObjectType gco:nilReason="unknown">
-	      </gmd:geometricObjectType>
-	    {% endif %}
-	    {% if pkg_dict.spatial_geo_type %}
-	      <gmd:geometricObjectType>
-		<gmd:MD_GeometricObjectTypeCode
-		  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode"
-                  codeListValue="{{ pkg_dict.spatial_geo_type }}"/>
-	      </gmd:geometricObjectType>
-	    {% endif %}
-	    {% if pkg_dict.spatial_geo_count %}
-	      <gmd:geometricObjectCount>
-		<gco:Integer>
-		  {{ pkg_dict.spatial_geo_count }}
-		</gco:Integer>
-	      </gmd:geometricObjectCount>
-	    {% endif %}
-          </gmd:MD_GeometricObjects>
-        </gmd:geometricObjects>
-      </gmd:MD_VectorSpatialRepresentation>
-    </gmd:spatialRepresentationInfo>
-  {% endif %}
-
-  {% if pkg_dict.datum %}
-    <gmd:referenceSystemInfo>
-      <gmd:MD_ReferenceSystem>
-        <gmd:referenceSystemIdentifier>
-          <gmd:RS_Identifier>
-            <gmd:authority>
-	      {{ m.citation({'title': 'EPSG Geodetic Parameter Dataset', 'dates': [('2007-7-16', 'revision'),],}) }}
-            </gmd:authority>
-
-	    {% with codes={
-	      'AGD66 Geographic (Lat\Long)': '4202',
-	      'AGD66 / AMG Zone 54': '20254',
-	      'AGD66 / AMG Zone 55': '20255',
-	      'AGD66 / AMG Zone 56': '20256',
-	      'AGD66 / AMG Zone 57 (Lord Howe Is)': '20257',
-	      'GDA94 Geographic (Lat\Long)': '4283',
-	      'GDA94 / MGAZone 54': '28354',
-	      'GDA94 / MGAZone 55': '28355',
-	      'GDA94 / MGAZone 56': '28356',
-	      'GDA94 / MGAZone 57 (Lord Howe Is)': '28357',
-	      'GDA94 NSW Lamberts': '3308',
-	      'WSG84': '4979',
-	      'WSG84 / UTM Zone 54S': '32754',
-	      'WSG84 / UTM Zone 55S': '32755',
-	      'WSG84 / UTM Zone 56S': '32756',
-	      'WSG84 / UTM Zone 57S (Lord Howe Is)': '32757'
-	      } %}
-	      <gmd:code gco:nilReason="missing">
-                {{ m.cs(codes.get(datum_label ,'4283')) }}
-	      </gmd:code>
-	    {% endwith %}
-            <gmd:codeSpace>
-	      {{ m.cs(datum_label) }}
-            </gmd:codeSpace>
-            <gmd:version gco:nilReason="missing">
-	      {{ m.cs() }}
-            </gmd:version>
-          </gmd:RS_Identifier>
-        </gmd:referenceSystemIdentifier>
-      </gmd:MD_ReferenceSystem>
-    </gmd:referenceSystemInfo>
-  {% endif %}
-  <gmd:metadataExtensionInfo>
-    <gmd:MD_MetadataExtensionInformation>
-      <gmd:extensionOnLineResource>
-        <gmd:CI_OnlineResource>
-          <gmd:linkage />
-        </gmd:CI_OnlineResource>
-      </gmd:extensionOnLineResource>
-    </gmd:MD_MetadataExtensionInformation>
-  </gmd:metadataExtensionInfo>
-  <gmd:identificationInfo>
-    <gmd:MD_DataIdentification>
-      <gmd:citation>
-        {{ m.citation(ident_citation) }}
-      </gmd:citation>
-      {% if pkg_dict.get('notes') %}
-        <gmd:abstract gco:nilReason="missing">
-          {{ m.cs(pkg_dict.notes) }}
-        </gmd:abstract>
-      {% endif %}
-      {% if pkg_dict.get('purpose') %}
-        <gmd:purpose  gco:nilReason="missing">
-          {{ m.cs(pkg_dict.purpose) }}
-        </gmd:purpose>
-      {% endif %}
-      {% if pkg_dict.identification_status %}
-        <gmd:status >
-          <gmd:MD_ProgressCode
-	    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode"
-	    codeListValue="{{ pkg_dict.identification_status }}"/>
-        </gmd:status>
-      {% endif %}
-      <gmd:pointOfContact>
-        <gmd:CI_ResponsibleParty>
-          <gmd:organisationName>
-            {{ m.cs(owner_org.title) }}
-          </gmd:organisationName>
-          <gmd:positionName>
-	    {{ m.cs('Data Broker') }}
-          </gmd:positionName>
-          <gmd:contactInfo>
-            <gmd:CI_Contact>
-	      <gmd:phone>
-                <gmd:CI_Telephone>
-                  <gmd:voice>
-                    {{ m.cs(owner_org.voice) }}
-                  </gmd:voice>
-		  {% if owner_org.get('fax') %}
-                    <gmd:facsimile >
-		      {{ m.cs(owner_org.fax) }}
-                    </gmd:facsimile>
-		  {% endif %}
-                </gmd:CI_Telephone>
-	      </gmd:phone>
-	      <gmd:address>
-                <gmd:CI_Address>
-		  {% if owner_org.delivery %}
-                    <gmd:deliveryPoint >
-		      {{ m.cs(owner_org.delivery) }}
-                    </gmd:deliveryPoint>
-		  {% endif %}
-		  {% if owner_org.city %}
-                    <gmd:city >
-		      {{ m.cs(owner_org.city) }}
-                    </gmd:city>
-		  {% endif %}
-		  {% if owner_org.code %}
-                    <gmd:postalCode >
-		      {{ m.cs(owner_org.code) }}
-                    </gmd:postalCode>
-		  {% endif %}
-		  {% if owner_org.country %}
-                    <gmd:country >
-		      {{ m.cs(owner_org.country) }}
-                    </gmd:country>
-		  {% endif %}
-                  <gmd:electronicMailAddress>
-                    {{ m.cs(owner_org.email) }}
-                  </gmd:electronicMailAddress>
-                </gmd:CI_Address>
-	      </gmd:address>
-	      <gmd:onlineResource>
-                <gmd:CI_OnlineResource>
-                  <gmd:linkage>
-                    <gmd:URL>
-		      {{ owner_org['website'] }}
-		    </gmd:URL>
-                  </gmd:linkage>
-                </gmd:CI_OnlineResource>
-	      </gmd:onlineResource>
-            </gmd:CI_Contact>
-          </gmd:contactInfo>
-          <gmd:role>
-            <gmd:CI_RoleCode
-	      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
-	      codeListValue="pointOfContact"/>
-          </gmd:role>
-        </gmd:CI_ResponsibleParty>
-      </gmd:pointOfContact>
-      <gmd:resourceMaintenance>
-        <gmd:MD_MaintenanceInformation>
-          <gmd:maintenanceAndUpdateFrequency gco:nilReason="missing">
-            <gmd:MD_MaintenanceFrequencyCode
-	      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode"
-	      codeListValue="{{ pkg_dict.update_freq }}">
-	      {{ pkg_dict.update_freq }}
-	    </gmd:MD_MaintenanceFrequencyCode>
-          </gmd:maintenanceAndUpdateFrequency>
-	  {% if pkg_dict.next_update %}
-            <gmd:dateOfNextUpdate>
-	      <gco:Date>
-		{{ h.render_datetime(next_update, '%Y-%m-%d')}}
-	      </gco:Date>
-            </gmd:dateOfNextUpdate>
-	  {% endif %}
-          <gmd:contact>
-            {{ m.responsibleParty(owner_org, role='pointOfContact', short_resource=False) }}
-          </gmd:contact>
-        </gmd:MD_MaintenanceInformation>
-      </gmd:resourceMaintenance>
-      <gmd:graphicOverview>
-        <gmd:MD_BrowseGraphic>
-          <gmd:fileName gco:nilReason="missing">
-            {{ m.cs() }}
-          </gmd:fileName>
-          <gmd:fileDescription gco:nilReason="missing">
-            {{ m.cs() }}
-          </gmd:fileDescription>
-          <gmd:fileType gco:nilReason="missing">
-            {{ m.cs() }}
-          </gmd:fileType>
-        </gmd:MD_BrowseGraphic>
-      </gmd:graphicOverview>
-      {% for rsc_dict in (pkg_dict.get('resources') or [{}]) %}
-        <gmd:resourceFormat>
-          <gmd:MD_Format>
-            <gmd:name gco:nilReason="missing">
-	      {{ m.cs(rsc_dict.get('format') or 'undefined') }}
-            </gmd:name>
-            <gmd:version gco:nilReason="missing">
-	      {{ m.cs(rsc_dict.get('version') or 'undefined') }}
-            </gmd:version>
-          </gmd:MD_Format>
-        </gmd:resourceFormat>
-      {% endfor %}
-      {% if keywords %}
-        <gmd:descriptiveKeywords>
-          <gmd:MD_Keywords>
-	    {% for keyword in keywords %}
-	      <gmd:keyword  gco:nilReason="missing">
-		{{ m.cs(keyword) }}
-	      </gmd:keyword>
-	    {% endfor %}
-            <gmd:type>
-	      <gmd:MD_KeywordTypeCode
-		codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
-                codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
-            </gmd:type>
-            <gmd:thesaurusName>
-	      {{ m.citation({'title':            'ANZLIC Search Words', 'dates':[('2008-05-16', 'revision'),], 'edition':          'Version 2.1', 'edition_date':     '2008-05-16', 'identifier':       'http://asdd.ga.gov.au/asdd/profileinfo/anzlic-theme.xml#anzlic-theme', 'responsible':      {'org':     {'title': 'ANZLIC the Spatial Information Council'}, 'role':     'custodian', 'with_contact': False}, 'with_edition': True}) }}
-            </gmd:thesaurusName>
-          </gmd:MD_Keywords>
-        </gmd:descriptiveKeywords>
-      {% endif %}
-      {% if pkg_dict.get('field_of_research') != None %}
-        <gmd:descriptiveKeywords>
-          <gmd:MD_Keywords>
-	    {% for keyword in pkg_dict.get('field_of_research').split(',') %}
-	      <gmd:keyword>
-                {{ m.cs(keyword) }}
-	      </gmd:keyword>
-	    {% endfor %}
-            <gmd:thesaurusName>
-	      {{ m.citation({'title':            '1297.0 -  Australian and New Zealand Standard Research Classification (ANZSRC), 2008: Fields of Research', 'alternative_title': 'FOR 2008', 'dates':[('2008-03-31', 'publication'),], 'edition':          '', 'edition_date':     '', 'identifier':       'http://www.abs.gov.au/ausstats/abs@.nsf/Latestproducts/1297.0Main%20Features32008?opendocument&amp;tabname=Summary&amp;prodno=1297.0&amp;issue=2008&amp;num=&amp;view=', 'responsible':      {'org':     {'title': 'Australian Bureau of Statistics (ABS)'}, 'role':     'owner', 'with_contact': False}, 'with_edition': False}) }}
-            </gmd:thesaurusName>
-          </gmd:MD_Keywords>
-        </gmd:descriptiveKeywords>
-      {% endif %}
-      <gmd:resourceConstraints>
-        {{ m.legal_constraints() }}
-      </gmd:resourceConstraints>
-      <gmd:resourceConstraints>
-        <gmd:MD_SecurityConstraints>
-          <gmd:classification >
-            <gmd:MD_ClassificationCode
-	      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode"
-	      codeListValue="unclassified"/>
-          </gmd:classification>
-        </gmd:MD_SecurityConstraints>
-      </gmd:resourceConstraints>
-
-      <gmd:aggregationInfo>
-        <gmd:MD_AggregateInformation>
-          <gmd:aggregateDataSetIdentifier>
-            <gmd:MD_Identifier>
-	      <gmd:code gco:nilReason="missing">
-		{{ m.cs() }}
-	      </gmd:code>
-            </gmd:MD_Identifier>
-          </gmd:aggregateDataSetIdentifier>
-          <gmd:associationType>
-            <gmd:DS_AssociationTypeCode
-	      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode"
-	      codeListValue=""/>
-          </gmd:associationType>
-        </gmd:MD_AggregateInformation>
-      </gmd:aggregationInfo>
-      {% if pkg_dict.get('geospatial_representation') != 'non_geospatial' %}
-        <gmd:spatialRepresentationType>
-          <gmd:MD_SpatialRepresentationTypeCode
-	    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode"
-            codeListValue="{{ {'vector': 'vector', 'raster': 'grid', 'textTable': 'textTable', 'video': 'video'}.get(pkg_dict.get('geospatial_representation') or 'vector') }}"/>
-        </gmd:spatialRepresentationType>
-      {% endif %}
-
-      {% if pkg_dict.get('spatial_distance') or pkg_dict.get('equivalent_scale') %}
-        <gmd:spatialResolution>
-          <gmd:MD_Resolution>
-	    {% if pkg_dict.get('spatial_distance') %}
-	      <gmd:distance >
-                <gco:Distance uom="{{ pkg_dict.get('spatial_units', 'm') }}">
-                  {{ pkg_dict.get('spatial_distance') }}
-                </gco:Distance>
-	      </gmd:distance>
-	    {% endif %}
-	    {% if pkg_dict.get('equivalent_scale') and not pkg_dict.get('spatial_distance') %}
-	      <gmd:equivalentScale >
-                <gmd:MD_RepresentativeFraction>
-                  <gmd:denominator>
-                    <gco:Integer>
-		      {{ pkg_dict.equivalent_scale }}
-		    </gco:Integer>
-                  </gmd:denominator>
-                </gmd:MD_RepresentativeFraction>
-	      </gmd:equivalentScale>
-	    {% endif %}
-          </gmd:MD_Resolution>
-        </gmd:spatialResolution>
-      {% endif %}
-      <gmd:language gco:nilReason="missing">
-        <gmd:LanguageCode
-	  codeList="http://www.loc.gov/standards/iso639-2/"
-	  codeListValue="{{ language }}" />
-      </gmd:language>
-      <gmd:characterSet>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:geonet='http://www.fao.org/geonetwork'
+    xmlns:gco="http://www.isotc211.org/2005/gco"
+    xmlns:gmd="http://www.isotc211.org/2005/gmd"
+    xmlns:gts="http://www.isotc211.org/2005/gts"
+    xmlns:gsr="http://www.isotc211.org/2005/gsr"
+    xmlns:gss="http://www.isotc211.org/2005/gss"
+    xmlns:gmx="http://www.isotc211.org/2005/gmx"
+    xmlns:gml="http://www.opengis.net/gml"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://www.isotc211.org/2005/gmd/gmd.xsd http://www.opengis.net/gml http://www.opengis.net/gml/gml.xsd http://www.w3.org/1999/xlink http://www.w3.org/1999/xlink/xlinks.xsd ">
+    <gmd:fileIdentifier gco:nilReason="missing">
+        {{ m.cs(pkg_dict.id) }}
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="{{ language }}" />
+    </gmd:language>
+    <gmd:characterSet>
         <gmd:MD_CharacterSetCode
-	  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode"
-	  codeListValue="utf8"/>
-      </gmd:characterSet>
-      {% if pkg_dict.get('geospatial_topic','')|length %}
-	{% for geospatial_topic in pkg_dict.get('geospatial_topic','').split(',') %}
-          <gmd:topicCategory>
-            <gmd:MD_TopicCategoryCode>
-	      {{ geospatial_topic }}
-	    </gmd:MD_TopicCategoryCode>
-          </gmd:topicCategory>
-	{% endfor %}
-      {% endif %}
-      <gmd:extent>
-        <gmd:EX_Extent>
-	  {% if pkg_dict.get('place_name') %}
-            <gmd:description>
-	      {{ m.cs(pkg_dict.get('place_name')) }}
-            </gmd:description>
-	  {% else %}
-            <gmd:description gco:nilReason="missing"></gmd:description>
-	  {% endif %}
-	  {% if spatial_box != None %}
-            <gmd:geographicElement >
-	      {% with  (minx,miny,maxx,maxy) = spatial_box %}
-                <gmd:EX_GeographicBoundingBox >
-                  <gmd:westBoundLongitude>
-		    <gco:Decimal>
-		      {{ "{0:f}".format(minx).rstrip('0').rstrip('.') }}
-		  </gco:Decimal></gmd:westBoundLongitude>
-                  <gmd:eastBoundLongitude><gco:Decimal>
-		      {{ "{0:f}".format(maxx).rstrip('0').rstrip('.') }}
-		  </gco:Decimal></gmd:eastBoundLongitude>
-                  <gmd:southBoundLatitude><gco:Decimal>
-		      {{ "{0:f}".format(miny).rstrip('0').rstrip('.') }}
-		  </gco:Decimal></gmd:southBoundLatitude>
-                  <gmd:northBoundLatitude><gco:Decimal>
-		      {{ "{0:f}".format(maxy).rstrip('0').rstrip('.') }}
-		    </gco:Decimal>
-		  </gmd:northBoundLatitude>
-                </gmd:EX_GeographicBoundingBox>
-	      {% endwith %}
-            </gmd:geographicElement>
-	  {% endif %}
+            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharactersetCode" codeListValue="UTF-8"/>
+    </gmd:characterSet>
+    <gmd:parentIdentifier gco:nilReason="missing">
+        {% if pkg_dict.parent_id %}
+            {{ m.cs('{' + pkg_dict.parent_id + '}') }}
+        {% endif %}
+    </gmd:parentIdentifier>
+    <gmd:contact>
+        {{ m.responsibleParty(owner_org, role='Distributor', position='Data Broker',with_individual=False) }}
+    </gmd:contact>
+    <gmd:dateStamp>
+        <gco:Date>
+            {{ h.render_datetime(date_stamp, '%Y-%m-%d')}}
+        </gco:Date>
+    </gmd:dateStamp>
+    <gmd:metadataStandardName gco:nilReason="missing">
+        {{ m.cs('ANZLIC Metadata Profile: An Australian/New Zealand Profile of AS/NZS ISO 19115:2005, Geographic information - Metadata' ) }}
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion gco:nilReason="missing">
+        {{ m.cs('1.1') }}
+    </gmd:metadataStandardVersion>
+    <gmd:dataSetURI gco:nilReason="missing">
+        {{ m.cs(h.url_for(controller="package", action="read", id=pkg_dict.id, qualified=True)) }}
+    </gmd:dataSetURI>
+    {% if pkg_dict.geospatial_representation == 'vector' %}
+        <gmd:spatialRepresentationInfo>
+            <gmd:MD_VectorSpatialRepresentation>
+                <gmd:geometricObjects>
+                    <gmd:MD_GeometricObjects>
+	                {% if not pkg_dict.spatial_geo_type %}
+	                    <gmd:geometricObjectType gco:nilReason="unknown">
+	                    </gmd:geometricObjectType>
+	                {% endif %}
+	                {% if pkg_dict.spatial_geo_type %}
+	                    <gmd:geometricObjectType>
+		                <gmd:MD_GeometricObjectTypeCode
+		                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode"
+                                    codeListValue="{{ pkg_dict.spatial_geo_type }}"/>
+	                    </gmd:geometricObjectType>
+	                {% endif %}
+	                {% if pkg_dict.spatial_geo_count %}
+	                    <gmd:geometricObjectCount>
+		                <gco:Integer>
+		                    {{ pkg_dict.spatial_geo_count }}
+		                </gco:Integer>
+	                    </gmd:geometricObjectCount>
+	                {% endif %}
+                    </gmd:MD_GeometricObjects>
+                </gmd:geometricObjects>
+            </gmd:MD_VectorSpatialRepresentation>
+        </gmd:spatialRepresentationInfo>
+    {% endif %}
 
-          <gmd:temporalElement>
-            <gmd:EX_TemporalExtent>
-	      <gmd:extent>
-                <gml:TimePeriod gml:id="TP1">
-                  <gml:beginPosition>
-		    {{ h.render_datetime(temporal_coverage_from, '%Y-%m-%d')}}
-		  </gml:beginPosition>
-		  {% if pkg_dict.get('temporal_coverage_to') %}
-                    <gml:endPosition>
-		      {{ h.render_datetime(temporal_coverage_to, '%Y-%m-%d')}}
-		    </gml:endPosition>
-		  {% else %}
-                    <gml:endPosition indeterminatePosition="unknown" />
-		  {% endif %}
-                </gml:TimePeriod>
-	      </gmd:extent>
-            </gmd:EX_TemporalExtent>
-          </gmd:temporalElement>
-          <gmd:verticalElement>
-            <gmd:EX_VerticalExtent>
-	      <gmd:minimumValue>
-                <gco:Real>
-		  {{ vex.get('min') or -100 }}
-		</gco:Real>
-	      </gmd:minimumValue>
-	      <gmd:maximumValue>
-                <gco:Real>
-		  {{  vex.get('max') or 2228 }}
-		</gco:Real>
-	      </gmd:maximumValue>
-	      <gmd:verticalCRS>
-                <gml:VerticalCRS gml:id="v1">
-                  <gml:description/>
-                  <gml:identifier codeSpace="urn:ogc:def:cs:EPSG::">5711</gml:identifier>
-                  <gml:scope>Australia</gml:scope>
-                  <gml:verticalCS>
-                    <gml:VerticalCS gml:id="v2">
-		      <gml:identifier codeSpace="urn:ogc:def:cs:EPSG::">6499</gml:identifier>
-		      <gml:axis>
-                        <gml:CoordinateSystemAxis gml:uom="m" gml:id="v3">
-                          <gml:identifier codeSpace="urn:ogc:def:axis:EPSG::">5711</gml:identifier>
-                          <gml:axisAbbrev>AHD</gml:axisAbbrev>
-                          <gml:axisDirection codeSpace="urn:ogc:def:axisDirection:EPSG::">up</gml:axisDirection>
-                        </gml:CoordinateSystemAxis>
-		      </gml:axis>
-                    </gml:VerticalCS>
-                  </gml:verticalCS>
-                  <gml:verticalDatum/>
-                </gml:VerticalCRS>
-	      </gmd:verticalCRS>
-            </gmd:EX_VerticalExtent>
-          </gmd:verticalElement>
-        </gmd:EX_Extent>
-      </gmd:extent>
-      <gmd:supplementalInformation gco:nilReason="missing">
-        {{  m.cs(pkg_dict.get('extent_supplemental'))  }}
-      </gmd:supplementalInformation>
-    </gmd:MD_DataIdentification>
-  </gmd:identificationInfo>
-  {% if pkg_dict.package_type != 'report' %}
-    <gmd:contentInfo>
-      <gmd:MD_CoverageDescription>
-        <gmd:attributeDescription>
-          <gco:RecordType/>
-        </gmd:attributeDescription>
-        <gmd:contentType>
-          <gmd:MD_CoverageContentTypeCode
-	    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
-	    codeListValue=""/>
-        </gmd:contentType>
-      </gmd:MD_CoverageDescription>
-    </gmd:contentInfo>
-  {% endif %}
-  <gmd:distributionInfo>
-    <gmd:MD_Distribution>
-      <gmd:distributionFormat>
-        <gmd:MD_Format>
-          <gmd:name gco:nilReason="missing">
-	    {{ m.cs(pkg_dict.get('resource_format_name') or 'ZIP') }}
-          </gmd:name>
-          <gmd:version gco:nilReason="missing">
-            {{ m.cs(pkg_dict.get('resource_format_version') or '1.0') }}
-          </gmd:version>
-        </gmd:MD_Format>
-      </gmd:distributionFormat>
-      <gmd:distributor>
-        <gmd:MD_Distributor>
-          <gmd:distributorContact>
-            {{ m.responsibleParty(owner_org, role="Distributor", position='Data Broker', short_resource=False)}}
-          </gmd:distributorContact>
-          <gmd:distributionOrderProcess>
-            <gmd:MD_StandardOrderProcess>
-              <gmd:fees/>
-              <gmd:plannedAvailableDateTime>
-                <gco:DateTime>1900-01-01T09:00:00Z</gco:DateTime>
-              </gmd:plannedAvailableDateTime>
-              <gmd:orderingInstructions/>
-              <gmd:turnaround/>
-            </gmd:MD_StandardOrderProcess>
-          </gmd:distributionOrderProcess>
-	  {% if pkg_dict.get('resource_format_name') %}
-            <gmd:distributorFormat >
-              <gmd:MD_Format>
-                <gmd:name gco:nilReason="missing">
-                  {{ m.cs(pkg_dict.get('resource_format_name')) }}
-                </gmd:name>
-                <gmd:version gco:nilReason="missing">
-                  {{ m.cs(pkg_dict.get('resource_format_version', '1.0')) }}
-                </gmd:version>
-              </gmd:MD_Format>
-            </gmd:distributorFormat>
-	  {% endif %}
-        </gmd:MD_Distributor>
-      </gmd:distributor>
-      {% for rsc_dict in pkg_dict.resources or [] %}
-        <gmd:transferOptions>
-          <gmd:MD_DigitalTransferOptions>
-	    {% if rsc_dict.get('size') %}
-              <gmd:transferSize >
-                <gco:Real>{{rsc_dict['size']}}</gco:Real>
-              </gmd:transferSize>
-	    {% endif %}
-            <gmd:onLine>
-              <gmd:CI_OnlineResource>
-                <gmd:linkage>
-                  <gmd:URL>{{ rsc_dict.get('url') }}</gmd:URL>
-                </gmd:linkage>
-                {% if rsc_dict.get('format') == 'wms' or rsc_dict.get('format') == 'wfs' or rsc_dict.get('format') == 'kml' %}
-                  <gmd:protocol gco:nilReason="missing">
-                    {{ m.cs('OGC:' + rsc_dict.get('format')) }}
-                  </gmd:protocol>
-		{% endif %}
-                {% if rsc_dict.get('format') != 'wms' and rsc_dict.get('format') != 'wfs' and rsc_dict.get('format') != 'kml' %}
-                  <gmd:protocol gco:nilReason="missing">
-                    {{ m.cs('WWW:DOWNLOAD-1.0-http--download') }}
-                  </gmd:protocol>
-		{% endif %}
-		{% if rsc_dict.get('url') != rsc_dict.get('name') %}
-                  <gmd:name gco:nilReason="missing" >
-                    {{ m.cs(rsc_dict.get('name')) }}
-                  </gmd:name>
-		{% endif %}
-                <gmd:description gco:nilReason="missing">
-                  {{ m.cs(rsc_dict.get('description', '')) }}
-                </gmd:description>
-                {% if rsc_dict.get('format') == 'wms' or rsc_dict.get('format') == 'wfs' or rsc_dict.get('format') == 'kml' %}
-                  <gmd:function>
-                    <gmd:CI_OnLineFunctionCode
-		      codeList="http://asdd.ga.gov.au/asdd/profileinfo/gmxCodelists.xml#CI_OnLineFunctionCode"
-		      codeListValue="information">information</gmd:CI_OnLineFunctionCode>
-                  </gmd:function>
-		{% endif %}
-                {% if rsc_dict.get('url', '').startswith('mailto') %}
-                  <gmd:function>
-                    <gmd:CI_OnLineFunctionCode
-		      codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
-		      codeListValue="">order</gmd:CI_OnLineFunctionCode>
-                  </gmd:function>
-		{% endif %}
-                {% if rsc_dict.get('format') != 'wms' and rsc_dict.get('format') != 'wfs' and rsc_dict.get('format') != 'kml' and rsc_dict.get('url', '').startswith('http') %}
-                  <gmd:function>
-                    <gmd:CI_OnLineFunctionCode
-		      codeList="http://asdd.ga.gov.au/asdd/profileinfo/gmxCodelists.xml#CI_OnLineFunctionCode"
-		      codeListValue="download">download</gmd:CI_OnLineFunctionCode>
-                  </gmd:function>
-		{% endif %}
-              </gmd:CI_OnlineResource>
-            </gmd:onLine>
-          </gmd:MD_DigitalTransferOptions>
-        </gmd:transferOptions>
-      {% endfor %}
-    </gmd:MD_Distribution>
-  </gmd:distributionInfo>
-  <gmd:dataQualityInfo >
-    <gmd:DQ_DataQuality>
-      <gmd:scope>
-        <gmd:DQ_Scope>
-          <gmd:level>
-            <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
-          </gmd:level>
-        </gmd:DQ_Scope>
-      </gmd:scope>
+    {% if pkg_dict.datum %}
+        <gmd:referenceSystemInfo>
+            <gmd:MD_ReferenceSystem>
+                <gmd:referenceSystemIdentifier>
+                    <gmd:RS_Identifier>
+                        <gmd:authority>
+	                    {{ m.citation({'title': 'EPSG Geodetic Parameter Dataset', 'dates': [('2007-7-16', 'revision'),],}) }}
+                        </gmd:authority>
 
-      {% for report in reports if report.type or report.date or report.uid %}
-        <gmd:report>
-          <gmd:DQ_{{ report.title|replace(' ', '')}}>
-            {{ m.report_result(report) }}
-          </gmd:DQ_{{ report.title|replace(' ', '')}}>
-        </gmd:report>
-      {% endfor %}
-      <gmd:lineage>
-        <gmd:LI_Lineage>
-          <gmd:statement>
-	    {% if pkg_dict.get('lineage') %}
-              {{ m.cs(pkg_dict.get('lineage')) }}
-	    {% endif %}
-          </gmd:statement>
-          <gmd:source>
-            <gmd:LI_Source>
-              <gmd:description gco:nilReason="missing">
-                {{ m.cs('-') }}
-              </gmd:description>
-            </gmd:LI_Source>
-          </gmd:source>
+	                {% with codes={
+	                    'AGD66 Geographic (Lat\Long)': '4202',
+	                    'AGD66 / AMG Zone 54': '20254',
+	                    'AGD66 / AMG Zone 55': '20255',
+	                    'AGD66 / AMG Zone 56': '20256',
+	                    'AGD66 / AMG Zone 57 (Lord Howe Is)': '20257',
+	                    'GDA94 Geographic (Lat\Long)': '4283',
+	                    'GDA94 / MGAZone 54': '28354',
+	                    'GDA94 / MGAZone 55': '28355',
+	                    'GDA94 / MGAZone 56': '28356',
+	                    'GDA94 / MGAZone 57 (Lord Howe Is)': '28357',
+	                    'GDA94 NSW Lamberts': '3308',
+	                    'WSG84': '4979',
+	                    'WSG84 / UTM Zone 54S': '32754',
+	                    'WSG84 / UTM Zone 55S': '32755',
+	                    'WSG84 / UTM Zone 56S': '32756',
+	                    'WSG84 / UTM Zone 57S (Lord Howe Is)': '32757'
+	                } %}
+	                    <gmd:code gco:nilReason="missing">
+                                {{ m.cs(codes.get(datum_label ,'4283')) }}
+	                    </gmd:code>
+	                {% endwith %}
+                        <gmd:codeSpace>
+	                    {{ m.cs(datum_label) }}
+                        </gmd:codeSpace>
+                        <gmd:version gco:nilReason="missing">
+	                    {{ m.cs() }}
+                        </gmd:version>
+                    </gmd:RS_Identifier>
+                </gmd:referenceSystemIdentifier>
+            </gmd:MD_ReferenceSystem>
+        </gmd:referenceSystemInfo>
+    {% endif %}
+    <gmd:metadataExtensionInfo>
+        <gmd:MD_MetadataExtensionInformation>
+            <gmd:extensionOnLineResource>
+                <gmd:CI_OnlineResource>
+                    <gmd:linkage />
+                </gmd:CI_OnlineResource>
+            </gmd:extensionOnLineResource>
+        </gmd:MD_MetadataExtensionInformation>
+    </gmd:metadataExtensionInfo>
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification>
+            <gmd:citation>
+                {{ m.citation(ident_citation) }}
+            </gmd:citation>
+            {% if pkg_dict.get('notes') %}
+                <gmd:abstract gco:nilReason="missing">
+                    {{ m.cs(h.metaex_clean_html(h.render_markdown(pkg_dict.notes))) }}
+                </gmd:abstract>
+            {% endif %}
+            {% if pkg_dict.get('purpose') %}
+                <gmd:purpose  gco:nilReason="missing">
+                    {{ m.cs(pkg_dict.purpose) }}
+                </gmd:purpose>
+            {% endif %}
+            {% if pkg_dict.identification_status %}
+                <gmd:status >
+                    <gmd:MD_ProgressCode
+	                codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode"
+	                codeListValue="{{ pkg_dict.identification_status }}"/>
+                </gmd:status>
+            {% endif %}
+            <gmd:pointOfContact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:organisationName>
+                        {{ m.cs(owner_org.title) }}
+                    </gmd:organisationName>
+                    <gmd:positionName>
+	                {{ m.cs('Data Broker') }}
+                    </gmd:positionName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+	                    <gmd:phone>
+                                <gmd:CI_Telephone>
+                                    <gmd:voice>
+                                        {{ m.cs(owner_org.voice) }}
+                                    </gmd:voice>
+		                    {% if owner_org.get('fax') %}
+                                        <gmd:facsimile >
+		                            {{ m.cs(owner_org.fax) }}
+                                        </gmd:facsimile>
+		                    {% endif %}
+                                </gmd:CI_Telephone>
+	                    </gmd:phone>
+	                    <gmd:address>
+                                <gmd:CI_Address>
+		                    {% if owner_org.delivery %}
+                                        <gmd:deliveryPoint >
+		                            {{ m.cs(owner_org.delivery) }}
+                                        </gmd:deliveryPoint>
+		                    {% endif %}
+		                    {% if owner_org.city %}
+                                        <gmd:city >
+		                            {{ m.cs(owner_org.city) }}
+                                        </gmd:city>
+		                    {% endif %}
+		                    {% if owner_org.code %}
+                                        <gmd:postalCode >
+		                            {{ m.cs(owner_org.code) }}
+                                        </gmd:postalCode>
+		                    {% endif %}
+		                    {% if owner_org.country %}
+                                        <gmd:country >
+		                            {{ m.cs(owner_org.country) }}
+                                        </gmd:country>
+		                    {% endif %}
+                                    <gmd:electronicMailAddress>
+                                        {{ m.cs(owner_org.email) }}
+                                    </gmd:electronicMailAddress>
+                                </gmd:CI_Address>
+	                    </gmd:address>
+	                    <gmd:onlineResource>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>
+		                            {{ owner_org['website'] }}
+		                        </gmd:URL>
+                                    </gmd:linkage>
+                                </gmd:CI_OnlineResource>
+	                    </gmd:onlineResource>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode
+	                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode"
+	                    codeListValue="pointOfContact"/>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:pointOfContact>
+            <gmd:resourceMaintenance>
+                <gmd:MD_MaintenanceInformation>
+                    <gmd:maintenanceAndUpdateFrequency gco:nilReason="missing">
+                        <gmd:MD_MaintenanceFrequencyCode
+	                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode"
+	                    codeListValue="{{ pkg_dict.update_freq }}">
+	                    {{ pkg_dict.update_freq }}
+	                </gmd:MD_MaintenanceFrequencyCode>
+                    </gmd:maintenanceAndUpdateFrequency>
+	            {% if pkg_dict.next_update %}
+                        <gmd:dateOfNextUpdate>
+	                    <gco:Date>
+		                {{ h.render_datetime(next_update, '%Y-%m-%d')}}
+	                    </gco:Date>
+                        </gmd:dateOfNextUpdate>
+	            {% endif %}
+                    <gmd:contact>
+                        {{ m.responsibleParty(owner_org, role='pointOfContact', short_resource=False) }}
+                    </gmd:contact>
+                </gmd:MD_MaintenanceInformation>
+            </gmd:resourceMaintenance>
+            <gmd:graphicOverview>
+                <gmd:MD_BrowseGraphic>
+                    <gmd:fileName gco:nilReason="missing">
+                        {{ m.cs() }}
+                    </gmd:fileName>
+                    <gmd:fileDescription gco:nilReason="missing">
+                        {{ m.cs() }}
+                    </gmd:fileDescription>
+                    <gmd:fileType gco:nilReason="missing">
+                        {{ m.cs() }}
+                    </gmd:fileType>
+                </gmd:MD_BrowseGraphic>
+            </gmd:graphicOverview>
+            {% for rsc_dict in (pkg_dict.get('resources') or [{}]) %}
+                <gmd:resourceFormat>
+                    <gmd:MD_Format>
+                        <gmd:name gco:nilReason="missing">
+	                    {{ m.cs(rsc_dict.get('format') or 'undefined') }}
+                        </gmd:name>
+                        <gmd:version gco:nilReason="missing">
+	                    {{ m.cs(rsc_dict.get('version') or 'undefined') }}
+                        </gmd:version>
+                    </gmd:MD_Format>
+                </gmd:resourceFormat>
+            {% endfor %}
+            {% if keywords %}
+                <gmd:descriptiveKeywords>
+                    <gmd:MD_Keywords>
+	                {% for keyword in keywords %}
+	                    <gmd:keyword  gco:nilReason="missing">
+		                {{ m.cs(keyword) }}
+	                    </gmd:keyword>
+	                {% endfor %}
+                        <gmd:type>
+	                    <gmd:MD_KeywordTypeCode
+		                codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode"
+                                codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
+                        </gmd:type>
+                        <gmd:thesaurusName>
+	                    {{ m.citation({'title':            'ANZLIC Search Words', 'dates':[('2008-05-16', 'revision'),], 'edition':          'Version 2.1', 'edition_date':     '2008-05-16', 'identifier':       'http://asdd.ga.gov.au/asdd/profileinfo/anzlic-theme.xml#anzlic-theme', 'responsible':      {'org':     {'title': 'ANZLIC the Spatial Information Council'}, 'role':     'custodian', 'with_contact': False}, 'with_edition': True}) }}
+                        </gmd:thesaurusName>
+                    </gmd:MD_Keywords>
+                </gmd:descriptiveKeywords>
+            {% endif %}
+            {% if pkg_dict.get('field_of_research') != None %}
+                <gmd:descriptiveKeywords>
+                    <gmd:MD_Keywords>
+	                {% for keyword in pkg_dict.get('field_of_research').split(',') %}
+	                    <gmd:keyword>
+                                {{ m.cs(keyword) }}
+	                    </gmd:keyword>
+	                {% endfor %}
+                        <gmd:thesaurusName>
+	                    {{ m.citation({'title':            '1297.0 -  Australian and New Zealand Standard Research Classification (ANZSRC), 2008: Fields of Research', 'alternative_title': 'FOR 2008', 'dates':[('2008-03-31', 'publication'),], 'edition':          '', 'edition_date':     '', 'identifier':       'http://www.abs.gov.au/ausstats/abs@.nsf/Latestproducts/1297.0Main%20Features32008?opendocument&amp;tabname=Summary&amp;prodno=1297.0&amp;issue=2008&amp;num=&amp;view=', 'responsible':      {'org':     {'title': 'Australian Bureau of Statistics (ABS)'}, 'role':     'owner', 'with_contact': False}, 'with_edition': False}) }}
+                        </gmd:thesaurusName>
+                    </gmd:MD_Keywords>
+                </gmd:descriptiveKeywords>
+            {% endif %}
+            <gmd:resourceConstraints>
+                {{ m.legal_constraints() }}
+            </gmd:resourceConstraints>
+            <gmd:resourceConstraints>
+                <gmd:MD_SecurityConstraints>
+                    <gmd:classification >
+                        <gmd:MD_ClassificationCode
+	                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode"
+	                    codeListValue="unclassified"/>
+                    </gmd:classification>
+                </gmd:MD_SecurityConstraints>
+            </gmd:resourceConstraints>
 
-        </gmd:LI_Lineage>
-      </gmd:lineage>
+            <gmd:aggregationInfo>
+                <gmd:MD_AggregateInformation>
+                    <gmd:aggregateDataSetIdentifier>
+                        <gmd:MD_Identifier>
+	                    <gmd:code gco:nilReason="missing">
+		                {{ m.cs() }}
+	                    </gmd:code>
+                        </gmd:MD_Identifier>
+                    </gmd:aggregateDataSetIdentifier>
+                    <gmd:associationType>
+                        <gmd:DS_AssociationTypeCode
+	                    codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#DS_AssociationTypeCode"
+	                    codeListValue=""/>
+                    </gmd:associationType>
+                </gmd:MD_AggregateInformation>
+            </gmd:aggregationInfo>
+            {% if pkg_dict.get('geospatial_representation') != 'non_geospatial' %}
+                <gmd:spatialRepresentationType>
+                    <gmd:MD_SpatialRepresentationTypeCode
+	                codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode"
+                        codeListValue="{{ {'vector': 'vector', 'raster': 'grid', 'textTable': 'textTable', 'video': 'video'}.get(pkg_dict.get('geospatial_representation') or 'vector') }}"/>
+                </gmd:spatialRepresentationType>
+            {% endif %}
 
-    </gmd:DQ_DataQuality>
-  </gmd:dataQualityInfo>
+            {% if pkg_dict.get('spatial_distance') or pkg_dict.get('equivalent_scale') %}
+                <gmd:spatialResolution>
+                    <gmd:MD_Resolution>
+	                {% if pkg_dict.get('spatial_distance') %}
+	                    <gmd:distance >
+                                <gco:Distance uom="{{ pkg_dict.get('spatial_units', 'm') }}">
+                                    {{ pkg_dict.get('spatial_distance') }}
+                                </gco:Distance>
+	                    </gmd:distance>
+	                {% endif %}
+	                {% if pkg_dict.get('equivalent_scale') and not pkg_dict.get('spatial_distance') %}
+	                    <gmd:equivalentScale >
+                                <gmd:MD_RepresentativeFraction>
+                                    <gmd:denominator>
+                                        <gco:Integer>
+		                            {{ pkg_dict.equivalent_scale }}
+		                        </gco:Integer>
+                                    </gmd:denominator>
+                                </gmd:MD_RepresentativeFraction>
+	                    </gmd:equivalentScale>
+	                {% endif %}
+                    </gmd:MD_Resolution>
+                </gmd:spatialResolution>
+            {% endif %}
+            <gmd:language gco:nilReason="missing">
+                <gmd:LanguageCode
+	            codeList="http://www.loc.gov/standards/iso639-2/"
+	            codeListValue="{{ language }}" />
+            </gmd:language>
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode
+	            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode"
+	            codeListValue="utf8"/>
+            </gmd:characterSet>
+            {% if pkg_dict.get('geospatial_topic','')|length %}
+	        {% for geospatial_topic in pkg_dict.get('geospatial_topic','').split(',') %}
+                    <gmd:topicCategory>
+                        <gmd:MD_TopicCategoryCode>
+	                    {{ geospatial_topic }}
+	                </gmd:MD_TopicCategoryCode>
+                    </gmd:topicCategory>
+	        {% endfor %}
+            {% endif %}
+            <gmd:extent>
+                <gmd:EX_Extent>
+	            {% if pkg_dict.get('place_name') %}
+                        <gmd:description>
+	                    {{ m.cs(pkg_dict.get('place_name')) }}
+                        </gmd:description>
+	            {% else %}
+                        <gmd:description gco:nilReason="missing"></gmd:description>
+	            {% endif %}
+	            {% if spatial_box != None %}
+                        <gmd:geographicElement >
+	                    {% with  (minx,miny,maxx,maxy) = spatial_box %}
+                                <gmd:EX_GeographicBoundingBox >
+                                    <gmd:westBoundLongitude>
+		                        <gco:Decimal>
+		                            {{ "{0:f}".format(minx).rstrip('0').rstrip('.') }}
+		                        </gco:Decimal></gmd:westBoundLongitude>
+                                    <gmd:eastBoundLongitude><gco:Decimal>
+		                        {{ "{0:f}".format(maxx).rstrip('0').rstrip('.') }}
+		                    </gco:Decimal></gmd:eastBoundLongitude>
+                                    <gmd:southBoundLatitude><gco:Decimal>
+		                        {{ "{0:f}".format(miny).rstrip('0').rstrip('.') }}
+		                    </gco:Decimal></gmd:southBoundLatitude>
+                                    <gmd:northBoundLatitude><gco:Decimal>
+		                        {{ "{0:f}".format(maxy).rstrip('0').rstrip('.') }}
+		                    </gco:Decimal>
+		                    </gmd:northBoundLatitude>
+                                </gmd:EX_GeographicBoundingBox>
+	                    {% endwith %}
+                        </gmd:geographicElement>
+	            {% endif %}
 
-  {% if pkg_dict.get('package_type') != 'report' %}
-    <gmd:metadataConstraints >
-      {{ m.legal_constraints() }}
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent>
+	                    <gmd:extent>
+                                <gml:TimePeriod gml:id="TP1">
+                                    <gml:beginPosition>
+		                        {{ h.render_datetime(temporal_coverage_from, '%Y-%m-%d')}}
+		                    </gml:beginPosition>
+		                    {% if pkg_dict.get('temporal_coverage_to') %}
+                                        <gml:endPosition>
+		                            {{ h.render_datetime(temporal_coverage_to, '%Y-%m-%d')}}
+		                        </gml:endPosition>
+		                    {% else %}
+                                        <gml:endPosition indeterminatePosition="unknown" />
+		                    {% endif %}
+                                </gml:TimePeriod>
+	                    </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                    <gmd:verticalElement>
+                        <gmd:EX_VerticalExtent>
+	                    <gmd:minimumValue>
+                                <gco:Real>
+		                    {{ vex.get('min') or -100 }}
+		                </gco:Real>
+	                    </gmd:minimumValue>
+	                    <gmd:maximumValue>
+                                <gco:Real>
+		                    {{  vex.get('max') or 2228 }}
+		                </gco:Real>
+	                    </gmd:maximumValue>
+	                    <gmd:verticalCRS>
+                                <gml:VerticalCRS gml:id="v1">
+                                    <gml:description/>
+                                    <gml:identifier codeSpace="urn:ogc:def:cs:EPSG::">5711</gml:identifier>
+                                    <gml:scope>Australia</gml:scope>
+                                    <gml:verticalCS>
+                                        <gml:VerticalCS gml:id="v2">
+		                            <gml:identifier codeSpace="urn:ogc:def:cs:EPSG::">6499</gml:identifier>
+		                            <gml:axis>
+                                                <gml:CoordinateSystemAxis gml:uom="m" gml:id="v3">
+                                                    <gml:identifier codeSpace="urn:ogc:def:axis:EPSG::">5711</gml:identifier>
+                                                    <gml:axisAbbrev>AHD</gml:axisAbbrev>
+                                                    <gml:axisDirection codeSpace="urn:ogc:def:axisDirection:EPSG::">up</gml:axisDirection>
+                                                </gml:CoordinateSystemAxis>
+		                            </gml:axis>
+                                        </gml:VerticalCS>
+                                    </gml:verticalCS>
+                                    <gml:verticalDatum/>
+                                </gml:VerticalCRS>
+	                    </gmd:verticalCRS>
+                        </gmd:EX_VerticalExtent>
+                    </gmd:verticalElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+            <gmd:supplementalInformation gco:nilReason="missing">
+                {{  m.cs(h.metaex_clean_html(h.render_markdown(pkg_dict.get('extent_supplemental'))))  }}
+            </gmd:supplementalInformation>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+    {% if pkg_dict.package_type != 'report' %}
+        <gmd:contentInfo>
+            <gmd:MD_CoverageDescription>
+                <gmd:attributeDescription>
+                    <gco:RecordType/>
+                </gmd:attributeDescription>
+                <gmd:contentType>
+                    <gmd:MD_CoverageContentTypeCode
+	                codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode"
+	                codeListValue=""/>
+                </gmd:contentType>
+            </gmd:MD_CoverageDescription>
+        </gmd:contentInfo>
+    {% endif %}
+    <gmd:distributionInfo>
+        <gmd:MD_Distribution>
+            <gmd:distributionFormat>
+                <gmd:MD_Format>
+                    <gmd:name gco:nilReason="missing">
+	                {{ m.cs(pkg_dict.get('resource_format_name') or 'ZIP') }}
+                    </gmd:name>
+                    <gmd:version gco:nilReason="missing">
+                        {{ m.cs(pkg_dict.get('resource_format_version') or '1.0') }}
+                    </gmd:version>
+                </gmd:MD_Format>
+            </gmd:distributionFormat>
+            <gmd:distributor>
+                <gmd:MD_Distributor>
+                    <gmd:distributorContact>
+                        {{ m.responsibleParty(owner_org, role="Distributor", position='Data Broker', short_resource=False)}}
+                    </gmd:distributorContact>
+                    <gmd:distributionOrderProcess>
+                        <gmd:MD_StandardOrderProcess>
+                            <gmd:fees/>
+                            <gmd:plannedAvailableDateTime>
+                                <gco:DateTime>1900-01-01T09:00:00Z</gco:DateTime>
+                            </gmd:plannedAvailableDateTime>
+                            <gmd:orderingInstructions/>
+                            <gmd:turnaround/>
+                        </gmd:MD_StandardOrderProcess>
+                    </gmd:distributionOrderProcess>
+	            {% if pkg_dict.get('resource_format_name') %}
+                        <gmd:distributorFormat >
+                            <gmd:MD_Format>
+                                <gmd:name gco:nilReason="missing">
+                                    {{ m.cs(pkg_dict.get('resource_format_name')) }}
+                                </gmd:name>
+                                <gmd:version gco:nilReason="missing">
+                                    {{ m.cs(pkg_dict.get('resource_format_version', '1.0')) }}
+                                </gmd:version>
+                            </gmd:MD_Format>
+                        </gmd:distributorFormat>
+	            {% endif %}
+                </gmd:MD_Distributor>
+            </gmd:distributor>
+            {% for rsc_dict in pkg_dict.resources or [] %}
+                <gmd:transferOptions>
+                    <gmd:MD_DigitalTransferOptions>
+	                {% if rsc_dict.get('size') %}
+                            <gmd:transferSize >
+                                <gco:Real>{{rsc_dict['size']}}</gco:Real>
+                            </gmd:transferSize>
+	                {% endif %}
+                        <gmd:onLine>
+                            <gmd:CI_OnlineResource>
+                                <gmd:linkage>
+                                    <gmd:URL>{{ rsc_dict.get('url') }}</gmd:URL>
+                                </gmd:linkage>
+                                {% if rsc_dict.get('format') == 'wms' or rsc_dict.get('format') == 'wfs' or rsc_dict.get('format') == 'kml' %}
+                                    <gmd:protocol gco:nilReason="missing">
+                                        {{ m.cs('OGC:' + rsc_dict.get('format')) }}
+                                    </gmd:protocol>
+		                {% endif %}
+                                {% if rsc_dict.get('format') != 'wms' and rsc_dict.get('format') != 'wfs' and rsc_dict.get('format') != 'kml' %}
+                                    <gmd:protocol gco:nilReason="missing">
+                                        {{ m.cs('WWW:DOWNLOAD-1.0-http--download') }}
+                                    </gmd:protocol>
+		                {% endif %}
+		                {% if rsc_dict.get('url') != rsc_dict.get('name') %}
+                                    <gmd:name gco:nilReason="missing" >
+                                        {{ m.cs(rsc_dict.get('name')) }}
+                                    </gmd:name>
+		                {% endif %}
+                                <gmd:description gco:nilReason="missing">
+                                    {{ m.cs(h.metaex_clean_html(h.render_markdown(rsc_dict.get('description', '')))) }}
+                                </gmd:description>
+                                {% if rsc_dict.get('format') == 'wms' or rsc_dict.get('format') == 'wfs' or rsc_dict.get('format') == 'kml' %}
+                                    <gmd:function>
+                                        <gmd:CI_OnLineFunctionCode
+		                            codeList="http://asdd.ga.gov.au/asdd/profileinfo/gmxCodelists.xml#CI_OnLineFunctionCode"
+		                            codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+                                    </gmd:function>
+		                {% endif %}
+                                {% if rsc_dict.get('url', '').startswith('mailto') %}
+                                    <gmd:function>
+                                        <gmd:CI_OnLineFunctionCode
+		                            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode"
+		                            codeListValue="">order</gmd:CI_OnLineFunctionCode>
+                                    </gmd:function>
+		                {% endif %}
+                                {% if rsc_dict.get('format') != 'wms' and rsc_dict.get('format') != 'wfs' and rsc_dict.get('format') != 'kml' and rsc_dict.get('url', '').startswith('http') %}
+                                    <gmd:function>
+                                        <gmd:CI_OnLineFunctionCode
+		                            codeList="http://asdd.ga.gov.au/asdd/profileinfo/gmxCodelists.xml#CI_OnLineFunctionCode"
+		                            codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+                                    </gmd:function>
+		                {% endif %}
+                            </gmd:CI_OnlineResource>
+                        </gmd:onLine>
+                    </gmd:MD_DigitalTransferOptions>
+                </gmd:transferOptions>
+            {% endfor %}
+        </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+    <gmd:dataQualityInfo >
+        <gmd:DQ_DataQuality>
+            <gmd:scope>
+                <gmd:DQ_Scope>
+                    <gmd:level>
+                        <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
+                    </gmd:level>
+                </gmd:DQ_Scope>
+            </gmd:scope>
+
+            {% for report in reports if report.type or report.date or report.uid %}
+                <gmd:report>
+                    <gmd:DQ_{{ report.title|replace(' ', '')}}>
+                        {{ m.report_result(h.metaex_clean_html(h.render_markdown(report))) }}
+                    </gmd:DQ_{{ report.title|replace(' ', '')}}>
+                </gmd:report>
+            {% endfor %}
+            <gmd:lineage>
+                <gmd:LI_Lineage>
+                    <gmd:statement>
+	                {% if pkg_dict.get('lineage') %}
+                            {{ m.cs(h.metaex_clean_html(h.render_markdown(pkg_dict.get('lineage')))) }}
+	                {% endif %}
+                    </gmd:statement>
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description gco:nilReason="missing">
+                                {{ m.cs('-') }}
+                            </gmd:description>
+                        </gmd:LI_Source>
+                    </gmd:source>
+
+                </gmd:LI_Lineage>
+            </gmd:lineage>
+
+        </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
+
+    {% if pkg_dict.get('package_type') != 'report' %}
+        <gmd:metadataConstraints >
+            {{ m.legal_constraints() }}
+        </gmd:metadataConstraints>
+    {% endif %}
+    <gmd:metadataConstraints>
+        <gmd:MD_SecurityConstraints>
+            <gmd:classification >
+                <gmd:MD_ClassificationCode
+	            codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode"
+	            codeListValue="unclassified"/>
+            </gmd:classification>
+        </gmd:MD_SecurityConstraints>
     </gmd:metadataConstraints>
-  {% endif %}
-  <gmd:metadataConstraints>
-    <gmd:MD_SecurityConstraints>
-      <gmd:classification >
-        <gmd:MD_ClassificationCode
-	  codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode"
-	  codeListValue="unclassified"/>
-      </gmd:classification>
-    </gmd:MD_SecurityConstraints>
-  </gmd:metadataConstraints>
 </gmd:MD_Metadata>

@@ -232,6 +232,16 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% if pkg_dict.get('edition') %}
+                    <tr class="bordered">
+                        <td><h2>Edition</h2></td>
+                        <td>
+                            <p>
+                                {{ pkg_dict.get('edition') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
 
                 <tr class="bordered">
                     <td><h2 title="Resource language">Dataset language</h2></td>

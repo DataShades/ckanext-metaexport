@@ -1,1 +1,10 @@
-{% include 'metaexport/html.html' %}
+{% extends 'metaexport/html.html' %}
+
+{% block html_styles %}
+    {{ super() }}
+    <style>
+     .btn.print-btn {
+         display: none;
+     }
+    </style>
+{% endblock html_styles %}

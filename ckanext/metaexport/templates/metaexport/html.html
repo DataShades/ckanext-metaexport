@@ -8,7 +8,8 @@
         <meta name="DC.subject" scheme="eGMS.IPSV" content="metadata">
         <meta name="DC.language" scheme="DCTERMS.ISO639-2" content="{{ pkg_dict.get('language') or 'eng' }}">
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,400italic" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="{{g.site_url}}/base/vendor/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="{{ h.url_for_static('base/vendor/font-awesome/css/font-awesome.min.css', qualified=True) }}">
+
         {% block html_styles %}
             <style>
              body {

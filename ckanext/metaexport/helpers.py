@@ -55,10 +55,13 @@ def dataset_references_dates(data):
 
 
 def change_date_time_display(date_time, current_pattern, new_pattern):
-    date_time = datetime.strptime(
-        date_time,
-        current_pattern).strftime(new_pattern)
-    return date_time
+    try:
+        return datetime.strptime(
+            date_time,
+            current_pattern).strftime(new_pattern)
+    except ValueError:
+        return date_time
+
 
 def metaex_right_year(date):
     time = ''

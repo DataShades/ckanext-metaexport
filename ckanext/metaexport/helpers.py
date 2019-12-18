@@ -1,3 +1,4 @@
+from __future__ import print_function
 from dateutil.parser import parse
 from dateutil.tz import tzlocal
 from datetime import datetime
@@ -7,6 +8,7 @@ from bleach import clean as bleach_clean
 
 import ckan.logic as logic
 import ckan.model as model
+
 
 def get_helpers():
     return dict(
@@ -23,12 +25,12 @@ def get_helpers():
 
 
 def filter_list(data):
-    sorted_data = filter(lambda x: x, data.strip().split(','))
+    sorted_data = [x for x in data.strip().split(",") if x]
     return sorted_data
 
 
 def coordinate_format(coordinate):
-    coordinate = "{0:f}".format(coordinate).rstrip('0').rstrip('.')
+    coordinate = "{0:f}".format(coordinate).rstrip("0").rstrip(".")
     return coordinate
 
 
@@ -36,47 +38,52 @@ def metaexport_iso_date_with_tz(date, with_time=True, to_zero=False):
     try:
         dt, _, us = date.partition(".")
         if with_time:
-            return parse(
-                dt, dayfirst=True).replace(tzinfo=tzlocal()).isoformat()
+            return (
+                parse(dt, dayfirst=True).replace(tzinfo=tzlocal()).isoformat()
+            )
         else:
             formated_date = "{:04d}-{:02d}-{:02d}"
             date = parse(dt, dayfirst=True)
             return formated_date.format(date.year, date.month, date.day)
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         return date
 
 
 def dataset_references_dates(data):
     return [
-      (data[date_type + '_date'], date_type if date_type != 'identification' else 'creation')
-      for date_type in ('identification', 'publication', 'revision')
-      if data.get(date_type + '_date')]
+        (
+            data[date_type + "_date"],
+            date_type if date_type != "identification" else "creation",
+        )
+        for date_type in ("identification", "publication", "revision")
+        if data.get(date_type + "_date")
+    ]
 
 
 def change_date_time_display(date_time, current_pattern, new_pattern):
     try:
-        return datetime.strptime(
-            date_time,
-            current_pattern).strftime(new_pattern)
+        return datetime.strptime(date_time, current_pattern).strftime(
+            new_pattern
+        )
     except ValueError:
         return date_time
 
 
 def metaex_right_year(date):
-    time = ''
+    time = ""
     wrong_years = [1901, 1900]
     try:
-        time = datetime.strptime(
-            date, "%Y-%m-%d")
+        time = datetime.strptime(date, "%Y-%m-%d")
     except Exception as e:
-        print e
+        print(e)
 
     if time:
         year = time.year
         if year not in wrong_years:
             return True
     return False
+
 
 def metaex_get_top_org(org_id, show_full=False):
     org = model.Group.get(org_id)
@@ -85,8 +92,9 @@ def metaex_get_top_org(org_id, show_full=False):
         if parents:
             parent = parents[0]
             if show_full:
-                parent = logic.get_action('organization_show')(
-                    {}, {'id': parent.id})
+                parent = logic.get_action("organization_show")(
+                    {}, {"id": parent.id}
+                )
             return parent
 
 

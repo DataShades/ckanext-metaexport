@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
+from builtins import object
 import ckan.lib.base as base
 
+
 def _default_data_extractor(pkg_id):
-    return dict(
-        pkg_id=pkg_id
-    )
+    return dict(pkg_id=pkg_id)
 
 
 class Formatter(object):
     """Potentially static class-collection of all supported formats.
     """
+
     _formats = dict()
 
     @classmethod
@@ -22,7 +23,7 @@ class Formatter(object):
     def list_formats(cls):
         """List all registered formats.
         """
-        return cls._formats.keys()
+        return list(cls._formats.keys())
 
     @classmethod
     def get(cls, format):
@@ -38,7 +39,8 @@ class Format(object):
 
     :prop _content_type: value of `Content-Type` header
     """
-    _content_type = 'text/html; charset=utf-8'
+
+    _content_type = "text/html; charset=utf-8"
 
     def __init__(self):
         self._mandatory = set()

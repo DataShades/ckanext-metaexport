@@ -43,7 +43,7 @@
         {{ m.cs('1.1') }}
     </gmd:metadataStandardVersion>
     <gmd:dataSetURI gco:nilReason="missing">
-        {{ m.cs(h.url_for(controller="package", action="read", id=pkg_dict.id, qualified=True)) }}
+        {{ m.cs(h.url_for("dataset.read", id=pkg_dict.id, qualified=True)) }}
     </gmd:dataSetURI>
     {% if pkg_dict.geospatial_representation == 'vector' %}
         <gmd:spatialRepresentationInfo>

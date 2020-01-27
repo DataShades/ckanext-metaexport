@@ -51,8 +51,7 @@ class RdfFormat(Format):
         context = {"user": tk.c.user, "model": model}
         self._dataset_dict = tk.get_action("package_show")(context, {"id": id})
         self._dataset_url = h.url_for(
-            controller="package",
-            action="read",
+            "dataset.read",
             id=self._dataset_dict["id"],
             qualified=True,
         )

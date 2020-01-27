@@ -290,8 +290,8 @@
                     <td><h2 title="Dataset URI">Dataset URI</h2></td>
                     <td>
                         <p title="Dataset URI">
-                            <a href="{{ h.url_for(controller='package', action='read', id=pkg_dict.id, qualified=True) }}">
-                                {{ h.url_for(controller="package", action="read", id=pkg_dict.id, qualified=True) }}
+                            <a href="{{ h.url_for('dataset.read', id=pkg_dict.id, qualified=True) }}">
+                                {{ h.url_for("dataset.read", id=pkg_dict.id, qualified=True) }}
                             </a>
                         </p>
                     </td>

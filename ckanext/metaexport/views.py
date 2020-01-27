@@ -21,16 +21,16 @@ def export(id, format):
     try:
         tk.check_access("package_show", context, {"id": id})
     except tk.NotAuthorized:
-        return base.abort(
+        return tk.abort(
             403,
-            _("Not authorized to read dataset %s in %s format") % (id, format),
+            tk._("Not authorized to read dataset %s in %s format") % (id, format),
         )
     except tk.ObjectNotFound:
-        return base.abort(404, _("%s does not exist") % (id))
+        return tk.abort(404, tk._("%s does not exist") % (id))
     try:
         fmt = Formatter.get(format)
     except NameError:
-        return base.abort(404, _("%s format is not supported") % format)
+        return tk.abort(404, tk._("%s format is not supported") % format)
     data = fmt.extract_data(id)
 
     headers = {"content-type": fmt.get_content_type()}

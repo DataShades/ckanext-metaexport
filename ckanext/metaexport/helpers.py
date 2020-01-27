@@ -3,12 +3,13 @@ from dateutil.parser import parse
 from dateutil.tz import tzlocal
 from datetime import datetime
 import json
-
+import logging
 from bleach import clean as bleach_clean
 
 import ckan.logic as logic
 import ckan.model as model
 
+log = logging.getLogger(__name__)
 
 def get_helpers():
     return dict(
@@ -46,7 +47,7 @@ def metaexport_iso_date_with_tz(date, with_time=True, to_zero=False):
             date = parse(dt, dayfirst=True)
             return formated_date.format(date.year, date.month, date.day)
     except Exception as e:
-        print(e)
+        log.error('ISO date parse error: %s', e)
         return date
 
 

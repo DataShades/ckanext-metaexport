@@ -651,7 +651,7 @@
                     <td><h3>Begin position</h3></td>
                     <td>
                         <p>
-                            {{ h.metaexport_iso_date_with_tz(pkg_dict.get('temporal_coverage_from'), False) }}
+                            {{ h.metaexport_iso_date_with_tz(pkg_dict.get('temporal_coverage_from', ''), False) }}
                         </p>
                     </td>
                 </tr>

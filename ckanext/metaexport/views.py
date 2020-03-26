@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins.toolkit as tk
 import logging
@@ -16,6 +15,7 @@ log = logging.getLogger(__name__)
 metaexport = Blueprint("metaexport", __name__)
 
 
+@metaexport.route("/dataset/<id>/metaexport/<format>")
 def export(id, format):
     context = {"user": tk.c.user, "model": model}
     try:
@@ -23,7 +23,8 @@ def export(id, format):
     except tk.NotAuthorized:
         return tk.abort(
             403,
-            tk._("Not authorized to read dataset %s in %s format") % (id, format),
+            tk._("Not authorized to read dataset %s in %s format")
+            % (id, format),
         )
     except tk.ObjectNotFound:
         return tk.abort(404, tk._("%s does not exist") % (id))
@@ -47,9 +48,6 @@ def export(id, format):
         print(e)
     body = fmt.render("metaexport/{}.html".format(format), extra_vars=data)
     return make_response((body, headers))
-
-
-metaexport.add_url_rule("/dataset/<id>/metaexport/<format>", view_func=export)
 
 
 def get_blueprints():

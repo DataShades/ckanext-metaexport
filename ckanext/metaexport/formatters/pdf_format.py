@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from future import standard_library
-standard_library.install_aliases()
-import io
+from six import StringIO
 import pdfkit
 
 from . import Format
@@ -15,7 +13,6 @@ class PDFFormat(Format):
 
     def render(self, template, *args, **kwargs):
         html = super(PDFFormat, self).render(template, *args, **kwargs)
-        result = io.StringIO()
 
-        result = pdfkit.from_file(io.StringIO(html), False)
+        result = pdfkit.from_file(StringIO(html), False)
         return result

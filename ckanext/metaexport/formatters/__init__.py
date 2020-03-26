@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
-from builtins import object
 import ckan.lib.base as base
+import ckan.plugins.toolkit as tk
+import ckan.model as model
 
 
 def _default_data_extractor(pkg_id):
-    return dict(pkg_id=pkg_id)
+    context = {"user": tk.c.user, "model": model}
+    pkg_dict = tk.get_action("package_show")(context, {"id": pkg_id})
+    return dict(
+        pkg_id=pkg_id,
+        pkg_dict=pkg_dict,
+        owner_org=pkg_dict.get("organization", {}),
+        date_stamp=pkg_dict['metadata_modified']
+    )
 
 
 class Formatter(object):

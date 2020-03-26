@@ -1,14 +1,11 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from past.builtins import basestring
-from builtins import object
+import six
+
 import logging
 import uuid
 import json
 import datetime
 from dateutil.parser import parse as parse_date
-from urllib.parse import quote
+from six.moves.urllib.parse import quote
 
 from rdflib.namespace import XSD, Namespace
 from rdflib import Literal, URIRef
@@ -70,7 +67,7 @@ def get_list_triple(subject, predicate, value, _type=Literal):
     # List of values
     if isinstance(value, list):
         items = value
-    elif isinstance(value, basestring):
+    elif isinstance(value, six.string_types):
         try:
             # JSON list
             items = json.loads(value)
@@ -226,7 +223,7 @@ def catalog_uri():
                 + "`ckanext.dcat.base_uri` or `ckan.site_url` option"
             )
         else:
-            uri = "http://" + str(uuid.uuid4())
+            uri = "http://" + six.text_type(uuid.uuid4())
             log.critical(
                 "Using a random id as catalog URI, you should set "
                 + "the `ckanext.dcat.base_uri` or `ckan.site_url` "
@@ -297,7 +294,7 @@ class CleanedURIRef(object):
         return value
 
     def __new__(cls, value):
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             value = CleanedURIRef._careful_quote(value.strip())
         return URIRef(value)
 
@@ -318,6 +315,6 @@ def without_mailto(mail_addr):
     Ensures that the mail address string has no mailto: prefix.
     """
     if mail_addr:
-        return str(mail_addr).replace(PREFIX_MAILTO, u"")
+        return six.text_type(mail_addr).replace(PREFIX_MAILTO, u"")
     else:
         return mail_addr

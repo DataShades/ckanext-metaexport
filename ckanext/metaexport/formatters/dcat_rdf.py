@@ -32,22 +32,21 @@ from ckanext.metaexport.formatters.triple_helpers import (
 
 
 class DcatRdfFormat(RdfFormat):
-
     def extract_data(self, id):
         g = self._init_graph(id)
 
         # Basic fields
         items = [
-            ('title', DCT.title, None, Literal),
-            ('notes', DCT.description, None, Literal),
+            ("title", DCT.title, None, Literal),
+            ("notes", DCT.description, None, Literal),
             # ('url', DCAT.landingPage, None, URIRef),
-            ('identifier', DCT.identifier, ['guid', 'id'], Literal),
-            ('version', OWL.versionInfo, ['version'], Literal),
-            ('version_notes', ADMS.versionNotes, None, Literal),
-            ('frequency', DCT.accrualPeriodicity, None, Literal),
-            ('access_rights', DCT.accessRights, None, Literal),
-            ('dcat_type', DCT.type, None, Literal),
-            ('provenance', DCT.provenance, None, Literal),
+            ("identifier", DCT.identifier, ["guid", "id"], Literal),
+            ("version", OWL.versionInfo, ["version"], Literal),
+            ("version_notes", ADMS.versionNotes, None, Literal),
+            ("frequency", DCT.accrualPeriodicity, None, Literal),
+            ("access_rights", DCT.accessRights, None, Literal),
+            ("dcat_type", DCT.type, None, Literal),
+            ("provenance", DCT.provenance, None, Literal),
         ]
         for triple in get_triples_from_dict(
             self._dataset_dict, self._dataset_ref, items
@@ -56,13 +55,13 @@ class DcatRdfFormat(RdfFormat):
         g.add((self._dataset_ref, DCAT.landingPage, URIRef(self._dataset_url)))
 
         # Tags
-        for tag in self._dataset_dict.get('tags', []):
-            g.add((self._dataset_ref, DCAT.keyword, Literal(tag['name'])))
+        for tag in self._dataset_dict.get("tags", []):
+            g.add((self._dataset_ref, DCAT.keyword, Literal(tag["name"])))
 
         # Dates
         items = [
-            ('issued', DCT.issued, ['metadata_created'], Literal),
-            ('modified', DCT.modified, ['metadata_modified'], Literal),
+            ("issued", DCT.issued, ["metadata_created"], Literal),
+            ("modified", DCT.modified, ["metadata_modified"], Literal),
         ]
         for triple in get_triples_from_dict(
             self._dataset_dict, self._dataset_ref, items, date_value=True
@@ -71,17 +70,17 @@ class DcatRdfFormat(RdfFormat):
 
         #  Lists
         items = [
-            ('language', DCT.language, None, Literal),
-            ('theme', DCAT.theme, None, URIRef),
-            ('conforms_to', DCT.conformsTo, None, Literal),
-            ('alternate_identifier', ADMS.identifier, None, Literal),
-            ('documentation', FOAF.page, None, Literal),
+            ("language", DCT.language, None, Literal),
+            ("theme", DCAT.theme, None, URIRef),
+            ("conforms_to", DCT.conformsTo, None, Literal),
+            ("alternate_identifier", ADMS.identifier, None, Literal),
+            ("documentation", FOAF.page, None, Literal),
             # TODO: why we dont have this field?
             # ('related_resource', DCT.relation, None, Literal),
-            ('has_version', DCT.hasVersion, None, Literal),
-            ('is_version_of', DCT.isVersionOf, None, Literal),
-            ('source', DCT.source, None, Literal),
-            ('sample', ADMS.sample, None, Literal),
+            ("has_version", DCT.hasVersion, None, Literal),
+            ("is_version_of", DCT.isVersionOf, None, Literal),
+            ("source", DCT.source, None, Literal),
+            ("sample", ADMS.sample, None, Literal),
         ]
         for triple in get_list_triples_from_dict(
             self._dataset_dict, self._dataset_ref, items
@@ -90,17 +89,18 @@ class DcatRdfFormat(RdfFormat):
 
         # Contact details
         if any(
-            self._dataset_dict.get(field) for field in [
-                'contact_uri',
-                'contact_name',
-                'contact_email',
-                'maintainer',
-                'maintainer_email',
-                'author',
-                'author_email',
+            self._dataset_dict.get(field)
+            for field in [
+                "contact_uri",
+                "contact_name",
+                "contact_email",
+                "maintainer",
+                "maintainer_email",
+                "author",
+                "author_email",
             ]
         ):
-            contact_uri = self._dataset_dict.get('contact_uri')
+            contact_uri = self._dataset_dict.get("contact_uri")
             if contact_uri:
                 contact_details = CleanedURIRef(contact_uri)
             else:
@@ -110,8 +110,11 @@ class DcatRdfFormat(RdfFormat):
             g.add((self._dataset_ref, DCAT.contactPoint, contact_details))
 
             for triple in get_triple_from_dict(
-                self._dataset_dict, contact_details, VCARD.fn, 'contact_name',
-                ['maintainer', 'author']
+                self._dataset_dict,
+                contact_details,
+                VCARD.fn,
+                "contact_name",
+                ["maintainer", "author"],
             ):
                 g.add(triple)
             # Add mail address as URIRef, and ensure it has a mailto: prefix
@@ -119,24 +122,20 @@ class DcatRdfFormat(RdfFormat):
                 self._dataset_dict,
                 contact_details,
                 VCARD.hasEmail,
-                'contact_email', ['maintainer_email', 'author_email'],
+                "contact_email",
+                ["maintainer_email", "author_email"],
                 _type=URIRef,
-                value_modifier=add_mailto
+                value_modifier=add_mailto,
             ):
                 g.add(triple)
 
         # Publisher
         if any(
-            self._dataset_dict.get(field) for field in [
-                'publisher_uri',
-                'publisher_name',
-                'organization',
-            ]
+            self._dataset_dict.get(field)
+            for field in ["publisher_uri", "publisher_name", "organization",]
         ):
 
-            publisher_uri = publisher_uri_from_dataset_dict(
-                self._dataset_dict
-            )
+            publisher_uri = publisher_uri_from_dataset_dict(self._dataset_dict)
             if publisher_uri:
                 publisher_details = CleanedURIRef(publisher_uri)
             else:
@@ -146,9 +145,9 @@ class DcatRdfFormat(RdfFormat):
             g.add((publisher_details, RDF.type, FOAF.Organization))
             g.add((self._dataset_ref, DCT.publisher, publisher_details))
 
-            publisher_name = self._dataset_dict.get('publisher_name')
-            if not publisher_name and self._dataset_dict.get('organization'):
-                publisher_name = self._dataset_dict['organization']['title']
+            publisher_name = self._dataset_dict.get("publisher_name")
+            if not publisher_name and self._dataset_dict.get("organization"):
+                publisher_name = self._dataset_dict["organization"]["title"]
 
             g.add((publisher_details, FOAF.name, Literal(publisher_name)))
             # TODO: It would make sense to fallback these to organization
@@ -156,9 +155,9 @@ class DcatRdfFormat(RdfFormat):
             # `organization` object in the self._dataset_dict does not include
             # custom fields
             items = [
-                ('publisher_email', FOAF.mbox, None, Literal),
-                ('publisher_url', FOAF.homepage, None, URIRef),
-                ('publisher_type', DCT.type, None, Literal),
+                ("publisher_email", FOAF.mbox, None, Literal),
+                ("publisher_url", FOAF.homepage, None, URIRef),
+                ("publisher_type", DCT.type, None, Literal),
             ]
 
             for triple in get_triples_from_dict(
@@ -167,8 +166,8 @@ class DcatRdfFormat(RdfFormat):
                 g.add(triple)
 
         # Temporal
-        start = self._dataset_dict.get('temporal_start')
-        end = self._dataset_dict.get('temporal_end')
+        start = self._dataset_dict.get("temporal_start")
+        end = self._dataset_dict.get("temporal_end")
         if start or end:
             temporal_extent = BNode()
 
@@ -182,9 +181,9 @@ class DcatRdfFormat(RdfFormat):
             g.add((self._dataset_ref, DCT.temporal, temporal_extent))
 
         # Spatial
-        spatial_uri = self._dataset_dict.get('spatial_uri')
-        spatial_text = self._dataset_dict.get('spatial_text')
-        spatial_geom = self._dataset_dict.get('spatial')
+        spatial_uri = self._dataset_dict.get("spatial_uri")
+        spatial_text = self._dataset_dict.get("spatial_text")
+        spatial_geom = self._dataset_dict.get("spatial")
 
         if spatial_uri or spatial_text or spatial_geom:
             if spatial_uri:
@@ -200,24 +199,32 @@ class DcatRdfFormat(RdfFormat):
 
             if spatial_geom:
                 # GeoJSON
-                g.add((
-                    spatial_ref, LOCN.geometry,
-                    Literal(spatial_geom, datatype=GEOJSON_IMT)
-                ))
+                g.add(
+                    (
+                        spatial_ref,
+                        LOCN.geometry,
+                        Literal(spatial_geom, datatype=GEOJSON_IMT),
+                    )
+                )
                 # WKT, because GeoDCAT-AP says so
                 try:
-                    g.add((
-                        spatial_ref, LOCN.geometry,
-                        Literal(
-                            wkt.dumps(json.loads(spatial_geom), decimals=4),
-                            datatype=GSP.wktLiteral
+                    g.add(
+                        (
+                            spatial_ref,
+                            LOCN.geometry,
+                            Literal(
+                                wkt.dumps(
+                                    json.loads(spatial_geom), decimals=4
+                                ),
+                                datatype=GSP.wktLiteral,
+                            ),
                         )
-                    ))
+                    )
                 except (TypeError, ValueError, InvalidGeoJSONException):
                     pass
 
         # Resources
-        for resource_dict in self._dataset_dict.get('resources', []):
+        for resource_dict in self._dataset_dict.get("resources", []):
 
             distribution = CleanedURIRef(resource_uri(resource_dict))
 
@@ -227,14 +234,14 @@ class DcatRdfFormat(RdfFormat):
 
             #  Simple values
             items = [
-                ('name', DCT.title, None, Literal),
-                ('description', DCT.description, None, Literal),
-                ('status', ADMS.status, None, Literal),
-                ('rights', DCT.rights, None, Literal),
+                ("name", DCT.title, None, Literal),
+                ("description", DCT.description, None, Literal),
+                ("status", ADMS.status, None, Literal),
+                ("rights", DCT.rights, None, Literal),
                 # TODO: we are avoiding licenses right now
                 # ('license', DCT.license, None, Literal),
-                ('access_url', DCAT.accessURL, None, URIRef),
-                ('download_url', DCAT.downloadURL, None, URIRef),
+                ("access_url", DCAT.accessURL, None, URIRef),
+                ("download_url", DCAT.downloadURL, None, URIRef),
             ]
 
             for triple in get_triples_from_dict(
@@ -244,9 +251,9 @@ class DcatRdfFormat(RdfFormat):
 
             #  Lists
             items = [
-                ('documentation', FOAF.page, None, Literal),
-                ('language', DCT.language, None, Literal),
-                ('conforms_to', DCT.conformsTo, None, Literal),
+                ("documentation", FOAF.page, None, Literal),
+                ("language", DCT.language, None, Literal),
+                ("conforms_to", DCT.conformsTo, None, Literal),
             ]
             for triple in get_list_triples_from_dict(
                 resource_dict, distribution, items
@@ -254,46 +261,56 @@ class DcatRdfFormat(RdfFormat):
                 g.add(triple)
 
             # Format
-            if '/' in resource_dict.get('format', ''):
-                g.add((
-                    distribution, DCAT.mediaType,
-                    Literal(resource_dict['format'])
-                ))
+            if "/" in resource_dict.get("format", ""):
+                g.add(
+                    (
+                        distribution,
+                        DCAT.mediaType,
+                        Literal(resource_dict["format"]),
+                    )
+                )
             else:
-                if resource_dict.get('format'):
-                    g.add((
-                        distribution, DCT['format'],
-                        Literal(resource_dict['format'])
-                    ))
+                if resource_dict.get("format"):
+                    g.add(
+                        (
+                            distribution,
+                            DCT["format"],
+                            Literal(resource_dict["format"]),
+                        )
+                    )
 
-                if resource_dict.get('mimetype'):
-                    g.add((
-                        distribution, DCAT.mediaType,
-                        Literal(resource_dict['mimetype'])
-                    ))
+                if resource_dict.get("mimetype"):
+                    g.add(
+                        (
+                            distribution,
+                            DCAT.mediaType,
+                            Literal(resource_dict["mimetype"]),
+                        )
+                    )
 
             # URL fallback and old behavior
-            url = resource_dict.get('url')
-            download_url = resource_dict.get('download_url')
-            access_url = resource_dict.get('access_url')
+            url = resource_dict.get("url")
+            download_url = resource_dict.get("download_url")
+            access_url = resource_dict.get("access_url")
             # Use url as fallback for access_url if access_url is not
             # set and download_url is not equal
             if url and not access_url:
-                if (not download_url
-                    ) or (download_url and url != download_url):
+                if (not download_url) or (
+                    download_url and url != download_url
+                ):
                     for triple in get_triple_from_dict(
                         resource_dict,
                         distribution,
                         DCAT.accessURL,
-                        'url',
-                        _type=URIRef
+                        "url",
+                        _type=URIRef,
                     ):
                         g.add(triple)
 
             # Dates
             items = [
-                ('issued', DCT.issued, None, Literal),
-                ('modified', DCT.modified, None, Literal),
+                ("issued", DCT.issued, None, Literal),
+                ("modified", DCT.modified, None, Literal),
             ]
 
             for triple in get_triples_from_dict(
@@ -302,40 +319,56 @@ class DcatRdfFormat(RdfFormat):
                 g.add(triple)
 
             # Numbers
-            if resource_dict.get('size'):
+            if resource_dict.get("size"):
                 try:
-                    g.add((
-                        distribution, DCAT.byteSize,
-                        Literal(
-                            float(resource_dict['size']), datatype=XSD.decimal
+                    g.add(
+                        (
+                            distribution,
+                            DCAT.byteSize,
+                            Literal(
+                                float(resource_dict["size"]),
+                                datatype=XSD.decimal,
+                            ),
                         )
-                    ))
+                    )
                 except (ValueError, TypeError):
-                    g.add((
-                        distribution, DCAT.byteSize,
-                        Literal(resource_dict['size'])
-                    ))
+                    g.add(
+                        (
+                            distribution,
+                            DCAT.byteSize,
+                            Literal(resource_dict["size"]),
+                        )
+                    )
             # Checksum
-            if resource_dict.get('hash'):
+            if resource_dict.get("hash"):
                 checksum = BNode()
                 g.add((checksum, RDF.type, SPDX.Checksum))
-                g.add((
-                    checksum, SPDX.checksumValue,
-                    Literal(resource_dict['hash'], datatype=XSD.hexBinary)
-                ))
+                g.add(
+                    (
+                        checksum,
+                        SPDX.checksumValue,
+                        Literal(resource_dict["hash"], datatype=XSD.hexBinary),
+                    )
+                )
 
-                if resource_dict.get('hash_algorithm'):
-                    if resource_dict['hash_algorithm'].startswith('http'):
-                        g.add((
-                            checksum, SPDX.algorithm,
-                            CleanedURIRef(resource_dict['hash_algorithm'])
-                        ))
+                if resource_dict.get("hash_algorithm"):
+                    if resource_dict["hash_algorithm"].startswith("http"):
+                        g.add(
+                            (
+                                checksum,
+                                SPDX.algorithm,
+                                CleanedURIRef(resource_dict["hash_algorithm"]),
+                            )
+                        )
                     else:
-                        g.add((
-                            checksum, SPDX.algorithm,
-                            Literal(resource_dict['hash_algorithm'])
-                        ))
+                        g.add(
+                            (
+                                checksum,
+                                SPDX.algorithm,
+                                Literal(resource_dict["hash_algorithm"]),
+                            )
+                        )
                 g.add((distribution, SPDX.checksum, checksum))
 
         # graph.add((dataset. RDF.about , Literal()))
-        return {'data': g.serialize(format='pretty-xml')}
+        return {"data": g.serialize(format="pretty-xml")}

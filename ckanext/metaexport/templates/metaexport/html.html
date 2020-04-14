@@ -290,8 +290,8 @@
                     <td><h2 title="Dataset URI">Dataset URI</h2></td>
                     <td>
                         <p title="Dataset URI">
-                            <a href="{{ h.url_for(controller='package', action='read', id=pkg_dict.id, qualified=True) }}">
-                                {{ h.url_for(controller="package", action="read", id=pkg_dict.id, qualified=True) }}
+                            <a href="{{ h.url_for('dataset.read', id=pkg_dict.id, qualified=True) }}">
+                                {{ h.url_for("dataset.read", id=pkg_dict.id, qualified=True) }}
                             </a>
                         </p>
                     </td>
@@ -651,7 +651,7 @@
                     <td><h3>Begin position</h3></td>
                     <td>
                         <p>
-                            {{ h.metaexport_iso_date_with_tz(pkg_dict.get('temporal_coverage_from'), False) }}
+                            {{ h.metaexport_iso_date_with_tz(pkg_dict.get('temporal_coverage_from', ''), False) }}
                         </p>
                     </td>
                 </tr>

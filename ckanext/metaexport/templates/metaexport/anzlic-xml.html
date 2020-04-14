@@ -677,7 +677,7 @@
     <gmd:metadataStandardVersion>{{ cs(data.metadata_standard_version) }}</gmd:metadataStandardVersion>
   {% endif %}
   <gmd:dataSetURI>
-    {{ cs(h.url_for(controller="package", action="read", id=data.id, qualified=True)) }}
+    {{ cs(h.url_for("dataset.read", id=data.id, qualified=True)) }}
   </gmd:dataSetURI>
   {% for locale in data.locale|default([]) %}
     <gmd:locale>

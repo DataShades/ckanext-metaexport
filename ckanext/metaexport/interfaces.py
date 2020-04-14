@@ -4,7 +4,7 @@ import ckan.plugins.interfaces as interfaces
 
 
 class IMetaexport(interfaces.Interface):
-    '''Define metadata export formats.'''
+    """Define metadata export formats."""
 
     def register_metaexport_format(self):
         """Register metadata format.

@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
 import ckan.lib.base as base
+import ckan.plugins.toolkit as tk
+import ckan.model as model
+
 
 def _default_data_extractor(pkg_id):
+    context = {"user": tk.c.user, "model": model}
+    pkg_dict = tk.get_action("package_show")(context, {"id": pkg_id})
     return dict(
-        pkg_id=pkg_id
+        pkg_id=pkg_id,
+        pkg_dict=pkg_dict,
+        owner_org=pkg_dict.get("organization", {}),
+        date_stamp=pkg_dict['metadata_modified']
     )
 
 
 class Formatter(object):
     """Potentially static class-collection of all supported formats.
     """
+
     _formats = dict()
 
     @classmethod
@@ -22,7 +31,7 @@ class Formatter(object):
     def list_formats(cls):
         """List all registered formats.
         """
-        return cls._formats.keys()
+        return list(cls._formats.keys())
 
     @classmethod
     def get(cls, format):
@@ -38,7 +47,8 @@ class Format(object):
 
     :prop _content_type: value of `Content-Type` header
     """
-    _content_type = 'text/html; charset=utf-8'
+
+    _content_type = "text/html; charset=utf-8"
 
     def __init__(self):
         self._mandatory = set()

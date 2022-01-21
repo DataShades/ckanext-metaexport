@@ -1,13 +1,6 @@
-.. You should enable this project on travis-ci.org and coveralls.io to make
-   these badges work. The necessary Travis and Coverage config files have been
-   generated for you.
-
-.. image:: https://travis-ci.org/DataShades/ckanext-metaexport.svg?branch=master
-    :target: https://travis-ci.org/DataShades/ckanext-metaexport
-
-=============
+==================
 ckanext-metaexport
-=============
+==================
 
 `ckanext-metaexport` proviedes universal way to export dataset's metadata into different metadata standards.
 

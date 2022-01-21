@@ -14,25 +14,24 @@ from ckanext.metaexport.formatters.eml_xml import EmlXmlFormat
 from ckanext.metaexport.formatters.anzlic_xml import AnzlicXmlFormat
 from ckanext.metaexport.interfaces import IMetaexport
 from ckanext.metaexport.helpers import get_helpers
+from ckanext.metaexport.views import get_blueprints
 
 
-if toolkit.check_ckan_version("2.9"):
-    from ckanext.metaexport.plugin.flask_plugin import MixinPlugin
-else:
-    from ckanext.metaexport.plugin.pylons_plugin import MixinPlugin
-
-
-class MetaexportPlugin(MixinPlugin, plugins.SingletonPlugin):
+class MetaexportPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(IMetaexport, inherit=True)
     plugins.implements(plugins.ITemplateHelpers)
+    plugins.implements(plugins.IBlueprint)
+
+    # IBlueprint
+
+    def get_blueprint(self):
+        return get_blueprints()
 
     # IConfigurer
 
     def update_config(self, config_):
-        toolkit.add_template_directory(config_, "../templates")
-        toolkit.add_public_directory(config_, "../public")
-        toolkit.add_resource("../fanstatic", "metaexport")
+        toolkit.add_template_directory(config_, "templates")
 
         for plugin in plugins.PluginImplementations(IMetaexport):
             Formatter.register(**plugin.register_metaexport_format())

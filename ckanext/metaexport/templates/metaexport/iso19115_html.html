@@ -1,0 +1,949 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <title>{{ pkg_dict.title }}</title>
+        <meta name="DC.source" content="{{ pkg_dict.id }}">
+        <meta name="DC.publisher" content="{{ owner_org.get('title') or (h.get_organization(owner_org.get('org')) or {}).get('title') }}">
+        <meta name="DC.subject" scheme="eGMS.IPSV" content="metadata">
+        <meta name="DC.language" scheme="DCTERMS.ISO639-2" content="{{ pkg_dict.get('language') or 'eng' }}">
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,400italic" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="{{ h.url_for_static('base/vendor/font-awesome/css/font-awesome.css', qualified=True) }}">
+
+        {% block html_styles %}
+            <style>
+             body {
+                 font-family: Arial, sans-serif;
+                 margin: 0px 30px;
+                 position: relative;
+             }
+
+             h1,
+             h2,
+             h3,
+             h4 {
+                 font-family: "Roboto Condensed", sans-serif;
+                 margin: 0px
+             }
+
+             h3,
+             h4,
+             h5 {
+                 margin: 0px;
+             }
+
+             h1 {
+                 font-size: 40px;
+                 margin-top: 40px;
+                 margin-bottom: 25px;
+             }
+
+             h2 {
+                 font-size: 22px;
+             }
+
+             h3 {
+                 font-size: 18px;
+             }
+
+             h4 {
+                 font-size: 16px;
+                 padding-left: 20px
+             }
+
+             p {
+                 line-height: 1.2;
+             }
+
+             a {
+                 color: #567621;
+             }
+
+             table {
+                 border: 1px solid #c4c4c4;
+                 border-collapse: collapse;
+                 width: 100%;
+                 margin-bottom: 10px
+             }
+
+             table thead th {
+                 background: #eaeaea none repeat scroll 0 0;
+                 color: #000;
+                 font-family: "Roboto Condensed", sans-serif;
+                 font-size: 16px;
+                 font-weight: 400;
+                 line-height: 24px;
+
+                 padding: 10px 15px;
+                 text-align: left;
+             }
+             table tbody td {
+                 text-align: left;
+                 padding: 10px 15px;
+             }
+
+             table thead th {
+                 width: 64%;
+             }
+
+             table thead th:first-child {
+                 width: 36%;
+             }
+
+             table tbody tr td:first-child {
+                 vertical-align: top;
+             }
+             thead { display: table-header-group; }
+             tfoot { display: table-row-group; }
+             tr { page-break-inside: avoid; }
+
+             table tr.bordered,
+             table thead {
+                 border-top: 1px solid #c4c4c4;
+             }
+
+             table tr.border-dot {
+                 border-bottom: 1px dotted #c4c4c4;
+             }
+
+             .btn {
+                 color: #000;
+                 text-decoration: none;
+                 background-color: #eaeaea;
+                 border: 1px solid #c4c4c4;
+                 padding: 5px 10px;
+             }
+
+             .btn:hover {
+                 color: #567621;
+             }
+
+             .btn.print-btn {
+                 position: absolute;
+                 right: 0;
+                 top: 8px;
+             }
+
+             @media print {
+                 .btn.print-btn {
+                     display: none;
+                 }
+                 body > h1, thead { display: none; }
+                 table {
+                     margin-bottom: 0px;
+                     page-break-inside: avoid;
+                 }
+             }
+            </style>
+        {% endblock %}
+    </head>
+    <body class="{% block body_classes%}{% endblock %}">
+        <a href="javascript:window.print()" class="btn print-btn"><i class="icon-print fa fa-print"></i> Print</a>
+        <h1>Identification</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><h2 title="Resource title">Title</h2></td>
+                    <td>
+                        <p title="Title">
+                            {{ pkg_dict.title }}
+                        </p>
+                    </td>
+                </tr>
+
+                {% if pkg_dict.get('alternative_title') %}
+                    <tr class="bordered">
+                        <td><h2>Alternative title(s)</h2></td>
+                        <td>
+                            <p title="Alternative title">
+                                {{ pkg_dict.get('alternative_title') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                <tr class="bordered">
+                    <td><h2 title="Resource abstract">Abstract</h2></td>
+                    <td>
+                        <p title="Abstract">
+                            {{ h.render_markdown(pkg_dict.get('notes')) }}
+                        </p>
+                    </td>
+                </tr>
+
+                <tr title="Resource locator" class="bordered border-dot">
+                    <td colspan="2"><h2 title="Resource locator">Resource locator</h2></td>
+                </tr>
+                {% for rsc_dict in pkg_dict.resources or [] %}
+                    <tr>
+                        <td>
+                            <h3><a href="{{ rsc_dict.get('url') }}">{{ rsc_dict.get('name') }}</a></h3>
+                        </td>
+                        <td>
+                            {% if rsc_dict.get('name') %}
+                                <p title="Online resource: name">Name: {{ rsc_dict.get('name') }}</p>
+                            {% endif %}
+                            <p title="Online resource: protocol">Protocol: WWW:DOWNLOAD-1.0-http--download</p>
+                            {% if rsc_dict.get('description') %}
+                                <p title="Online resource: description">Description: {{ h.render_markdown(rsc_dict.get('description')) }}</p>
+                            {% endif %}
+                            {% if rsc_dict.get('format') == 'wms' or rsc_dict.get('format') == 'wfs' or rsc_dict.get('format') == 'kml' %}
+                                <p title="Online resource: function">Function: {{ 'information' }}</p>
+                            {% endif %}
+                            {% if rsc_dict.get('url', '').startswith('mailto') %}
+                                <p title="Online resource: function">Function: {{ 'order' }}</p>
+                            {% endif %}
+                            {% if rsc_dict.get('format') != 'wms' and rsc_dict.get('format') != 'wfs' and rsc_dict.get('format') != 'kml' and rsc_dict.get('url', '').startswith('http') %}
+                                <p title="Online resource: function">Function: {{ 'download' }}</p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                <!-- end of addition -->
+                <tr class="bordered border-dot">
+                    <td colspan="2"><h2 title="Unique resource identifier">Unique resource identifier</h2></td>
+                </tr>
+                <tr>
+                    <td><h3 title="code">Code</h3></td>
+                    <td>
+                        <p title="Unique resource identifier: code">
+                            {{ pkg_dict.id }}
+                        </p>
+                    </td>
+                </tr>
+
+                <tr class="bordered">
+                    <td><h2>Presentation form</h2></td>
+                    <td>
+                        <!--TODO: humanize -->
+                        {% if pkg_dict.get('presentation_form') %}
+                            <p>
+                                {{ pkg_dict.get('presentation_form') }}
+                            </p>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if pkg_dict.get('edition') %}
+                    <tr class="bordered">
+                        <td><h2>Edition</h2></td>
+                        <td>
+                            <p>
+                                {{ pkg_dict.get('edition') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                <tr class="bordered">
+                    <td><h2 title="Resource language">Dataset language</h2></td>
+                    <td>
+                        <!--TODO: humanize -->
+                        <p title="Dataset language">
+                            {{ pkg_dict.get('language') or 'eng' }}
+                        </p>
+                    </td>
+                </tr>
+
+
+                <tr class="bordered border-dot">
+                    <td colspan="2"><h2 title="Resource language">Metadata standard</h2></td>
+                </tr>
+                    <tr>
+                        <td><h3>Name</h3></td>
+                        <td>
+                            <p title="Metadata standard name">
+                                ISO 19115
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h3>Edition</h3></td>
+                        <td>
+                            <p title="Metadata standard edition">
+                                2016
+                            </p>
+                        </td>
+                    </tr>
+
+
+                <tr class="bordered">
+                    <td><h2 title="Dataset URI">Dataset URI</h2></td>
+                    <td>
+                        <p title="Dataset URI">
+                            <a href="{{ h.url_for('dataset.read', id=pkg_dict.id, qualified=True) }}">
+                                {{ h.url_for("dataset.read", id=pkg_dict.id, qualified=True) }}
+                            </a>
+                        </p>
+                    </td>
+                </tr>
+
+                {% if pkg_dict.get('purpose') %}
+                    <tr class="bordered">
+                        <td><h2>Purpose</h2></td>
+                        <td>
+                            <p>
+                                {{ pkg_dict.get('purpose') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                <!--TODO: humanize -->
+                {% if pkg_dict.get('identification_status') %}
+                    <tr class="bordered">
+                        <td><h2>Status</h2></td>
+                        <td>
+                            <p>
+                                {{ pkg_dict.get('identification_status') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% set representation = {
+                    'vector': 'vector',
+                    'raster': 'grid',
+                    'textTable': 'textTable',
+                    'video': 'video'
+                }.get(pkg_dict.get('geospatial_representation') or 'vector') %}
+                {% if representation == 'vector' %}
+                    <tr class="bordered">
+                        <td colspan="2"><h2>Spatial representation</h2></td>
+                    </tr>
+                    <tr>
+                        <td><h3>Type</h3></td>
+                        <td>
+                            <p title="Spatial type">
+                                {{ representation }}
+                            </p>
+                        </td>
+                    </tr>
+                    {% for rep in pkg_dict.get("vector_spatial_representation", []) %}
+                        <tr>
+                            <td><h3>Geometric Object Type</h3></td>
+                            <td>
+                                <p title="Spatial Geometric Object Type">
+                                    {{ rep.type }}
+                                </p>
+                            </td>
+                        </tr>
+                        {% if rep.count is defined %}
+                            <tr>
+                                <td><h3>Geometric Object Count</h3></td>
+                                <td>
+                                    <p title="Spatial Geometric Object Count">
+                                        {{ rep.count }}
+                                    </p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor  %}
+                {% elif representation != 'vector' %}
+                    <tr class="bordered">
+                        <td><h2>Spatial representation type</h2></td>
+                        <td>
+                            <p>
+                                {{ representation }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                <tr class="bordered">
+                    <td colspan="2"><h2>Spatial reference system</h2></td>
+                </tr>
+                {% if datum_label %}
+                    <tr>
+                        <td><h3>Authority code</h3></td>
+                        <td>
+                            <p title="Spatial reference system: authority code">
+                                {{ datum_label }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% set codes = {
+                    'AGD66 Geographic (Lat\Long)': '4202',
+                    'AGD66 / AMG Zone 54': '20254',
+                    'AGD66 / AMG Zone 55': '20255',
+                    'AGD66 / AMG Zone 56': '20256',
+                    'AGD66 / AMG Zone 57 (Lord Howe Is)': '20257',
+                    'GDA94 Geographic (Lat\Long)': '4283',
+                    'GDA94 / MGAZone 54': '28354',
+                    'GDA94 / MGAZone 55': '28355',
+                    'GDA94 / MGAZone 56': '28356',
+                    'GDA94 / MGAZone 57 (Lord Howe Is)': '28357',
+                    'GDA94 NSW Lamberts': '3308',
+                    'WSG84': '4979',
+                    'WSG84 / UTM Zone 54S': '32754',
+                    'WSG84 / UTM Zone 55S': '32755',
+                    'WSG84 / UTM Zone 56S': '32756',
+                    'WSG84 / UTM Zone 57S (Lord Howe Is)': '32757'
+                }.get(datum_label) or '4283' %}
+                <tr>
+                    <td><h3>Code identifying the spatial reference system</h3></td>
+                    <td>
+                        <p title="Spatial reference system: code identifying the spatial reference system">
+                            {{ codes }}
+                        </p>
+                    </td>
+                </tr>
+
+                {% if pkg_dict.get('spatial_distance') and not pkg_dict.get('geospatial_representation') == 'non_geospatial' %}
+                    <tr class="bordered">
+                        <td><h2 title="Spatial resolution">Spatial resolution</h2></td>
+                        <td>
+                            <p title="Spatial resolution">
+                                {{ pkg_dict.get('spatial_distance') }}
+                                {{ pkg_dict.get('spatial_units', 'm') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if pkg_dict.get('equivalent_scale') and not pkg_dict.get('spatial_distance') %}
+                    <tr class="bordered">
+                        <td><h2 title="Spatial resolution">Equivalent scale</h2></td>
+                        <td>
+                            <p title="Equivalent scale">1:{{ pkg_dict.get('spatial_distance') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if pkg_dict.get('extent_supplemental') %}
+                    <tr class="bordered">
+                        <td><h2>Additional information source</h2></td>
+                        <td>
+                            <p title="Additional information source">
+                                {{ h.render_markdown(pkg_dict.get('extent_supplemental')) }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <h1>Classification of spatial data and services</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- section break -->
+                <tr>
+                    <td><h2 title="Topic category">Topic category</h2></td>
+                    <td>
+                        {% for geospatial_topic in pkg_dict.get('geospatial_topic',[]) %}
+                            <p title="Topic category">
+                                {{ geospatial_topic }}
+                            </p>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <h1>Keywords</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set keywords = h.filter_list(pkg_dict.get('keywords_string', '')) %}
+                <tr class="bordered border-dot">
+                    <td colspan="2">
+                        <h2>Keyword set</h2>
+                    </td>
+                </tr>
+                <tr class="border-dot">
+                    <td>
+                        <h3 title="Keyword value">keyword value</h3>
+                    </td>
+                    <td>
+                        {% for key in keywords %}
+                            <p title="keyword value">
+                                {{ key }}
+                            </p>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr class="bordered">
+                    <td colspan="2">
+                        <h3 title="Originating controlled vocabulary">Originating controlled vocabulary</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h4 title="title">Title</h4></td>
+                    <td><p>ANZLIC Search Words</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h4 title="reference date">Reference date</h4></td>
+                    <td><p>2008-05-16</p></td>
+                </tr>
+
+                <!-- section break -->
+                <tr class=" bordered border-dot">
+                    <td colspan="2">
+                        <h2 title="Geographic bounding box" >Geographic location</h2>
+                    </td>
+                </tr>
+                {% if pkg_dict.get('spatial') %}
+                    {% set spatial_box = h.spatial_bound(pkg_dict.get('spatial')) %}
+                    {% set minx,miny,maxx,maxy = spatial_box %}
+                    <tr class="border-dot">
+                        <td>
+                            <h3>West bounding longitude</h3>
+                        </td>
+                        <td>
+                            <p title="West bounding longitude">
+                                {{ h.coordinate_format(minx) }}
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class="border-dot">
+                        <td>
+                            <h3>East bounding longitude</h3>
+                        </td>
+                        <td>
+                            <p title="East bounding longitude">
+                                {{ h.coordinate_format(maxx) }}
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class="border-dot">
+                        <td>
+                            <h3>North bounding latitude</h3>
+                        </td>
+                        <td>
+                            <p title="North bounding latitude">
+                                {{ h.coordinate_format(miny) }}
+                            </p>
+                        </td>
+                    </tr>
+                    <tr class="border-dot">
+                        <td>
+                            <h3>South bounding latitude</h3>
+                        </td>
+                        <td>
+                            <p title="South bounding latitude">
+                                {{ h.coordinate_format(maxy) }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if pkg_dict.get('place_name') %}
+                    <tr>
+                        <td><h3>NSW Place Name</h3></td>
+                        <td>
+                            <p title="NSW Place Name">
+                                {{ pkg_dict.get('place_name') }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% set vex = h.meta_undump(pkg_dict.get('vertical_extent') or '{}') %}
+                <tr class="bordered border-dot">
+                    <td colspan="2"><h2>Vertical extent information</h2></td>
+                </tr>
+                <tr class="border-dot">
+                    <td><h3>Minimum value</h3></td>
+                    <td>
+                        <p title="Vertical extent: minimum value">
+                            {{ vex.get('min') or -100 }}
+                        </p>
+                    </td>
+                </tr>
+                <tr class="border-dot">
+                    <td><h3>Maximum value</h3></td>
+                    <td>
+                        <p title="Vertical extent: maximum value">
+                            {{ vex.get('max') or 2228 }}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h3>Coordinate reference system</h3></td>
+                </tr>
+                <tr>
+                    <td><h4>Authority code</h4></td>
+                    <td>
+                        <p title="Vertical extent: CRS authority">
+                            urn:ogc:def:cs:EPSG::
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h4>Code identifying the coordinate reference system</h4></td>
+                    <td>
+                        <p title="Vertical extent: CRS authority">
+                            5711
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- section break -->
+                <tr class="bordered border-dot">
+                    <td colspan="2">
+                        <!-- <h1>Temporal reference</h1> -->
+                        <h2 title="Temporal extent">Temporal extent</h2>
+                    </td>
+                </tr>
+                <tr class="border-dot">
+                    <td><h3>Begin position</h3></td>
+                    <td>
+                        <p>
+                            {{ h.metaexport_iso_date_with_tz(pkg_dict.get('temporal_coverage_from', ''), False) }}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h3>End position</h3></td>
+                    <td>
+                        <p>
+                            N/A
+                        </p>
+                    </td>
+                </tr>
+                <!-- section break -->
+                <tr class="bordered">
+                    <td colspan="2">
+                        <h2 title="Date of publication/last revision/creation">Dataset reference date</h2>
+                    </td>
+                </tr>
+                {% for date in pkg_dict.get("date_info", []) %}
+                    <tr>
+                        <td><h4>Date type</h4></td>
+                        <td><p title="date type">{{ date.type }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><h4>Effective date</h4></td>
+                        <td><p title="effective date">{{ date.date }}</p></td>
+                    </tr>
+                {% endfor %}
+
+                <!-- section break -->
+                <tr class="bordered border-dot">
+                    <td colspan="2"><h2 title="Metadata maintenance">Resource maintenance</h2></td>
+                </tr>
+                <tr class="border-dot">
+                    <td><h3>Maintenance and update frequency</h3></td>
+                    <!--TODO: humanize -->
+                    <td><p>{{ pkg_dict.get('update_freq') or pkg_dict.get("update_frequency") }}</p></td>
+                </tr>
+                <tr><td colspan="2"><h3>Contact info</h3></td></tr>
+                <tr>
+                    <td><h4>Organisation name</h4></td>
+                    <td><p>{{ owner_org.get('title') or (h.get_organization(owner_org.get('org')) or {}).get('title') }}</p></td>
+                </tr>
+                {% if owner_org.get('position')  %}
+                    <tr>
+                        <td><h4>Position</h4></td>
+                        <td><p>{{ owner_org.get('position') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% set org_info = ['delivery', 'city', 'area', 'code', 'country', 'email'] %}
+                {% if owner_org.get('delivery') or owner_org.get('city') or owner_org.get('area') or owner_org.get('code') or owner_org.get('country') or owner_org.get('email') %}
+                    <tr>
+                        <td><h4>Full postal address</h4></td>
+                        <td>
+                            {% for field in org_info %}
+                                {% if owner_org.get(field) %}
+                                    <p>{{ owner_org.get(field) }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+                </tr>
+                {% if owner_org.get('voice') %}
+                    <tr>
+                        <td><h4>Telephone number</h4></td>
+                        <td><p>{{ owner_org.get('voice') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('fax') %}
+                    <tr>
+                        <td><h4>Facsimile number</h4></td>
+                        <td><p>{{ owner_org.get('fax') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('email') %}
+                    <tr>
+                        <td><h4>Email address</h4></td>
+                        <td><p><a href="mailto:{{ owner_org.get('email') }}">{{ owner_org.get('email') }}</a></p></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td><h4>Responsible party role</h4></td>
+                    <td><p>pointOfContact</p></td>
+                </tr>
+            </tbody>
+        </table>
+        {% if pkg_dict.get('lineage') and not pkg_dict.get('geospatial_representation') == 'non_geospatial' %}
+            <h1>Quality and validity</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><h2 title="Lineage">Lineage</h2></td>
+                        <td>
+                            <p title="Lineage">
+                                {{ h.render_markdown(pkg_dict.get('lineage')) }}
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+        <h1>Constraints related to access and use</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if pkg_dict.get('use_limitation') %}
+                    <tr class="bordered border-dot">
+                        <td colspan="2"><h2>Constraint set</h2></td>
+                    </tr>
+                    <tr>
+                        <td><h3 title="conditions applying to access and use">Use constraints</h3></td>
+                        <td>
+                            <p title="Use constraints">
+                                {{ h.render_markdown(pkg_dict.get('use_limitation')) }}
+                            </p>
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td><h3 title="Limitations on public access">Limitations on public access</h3></td>
+                    <td>
+                        <p title="Limitations on public access">
+                            <!-- TO DO otherConstraints -->
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        {% set reports = pkg_dict.get("data_quality", []) %}
+        {% if reports %}
+            <h1>Data Quality</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bordered">
+                        <td><h3>Scope</h3></td>
+                        <td>
+                            <p>dataset</p>
+                        </td>
+                    </tr>
+                    {% for report in reports if report.date or report.details %}
+                        <tr class="bordered">
+                            <td colspan="2">
+                                <h3>
+                                    <!--TODO: humanize-->
+                                    {{ report.type }}
+                                </h3>
+                            </td>
+                        </tr>
+                        {% if report.date %}
+                            <tr>
+                                <td><h4>Effective date</h4></td>
+                                <td><p title="effective date">{{ report.date }}</p></td>
+                            </tr>
+                        {% endif %}
+                        {% if report.details %}
+                            <tr>
+                                <td><h4>Explanation</h4></td>
+                                <td>
+                                    {{ h.render_markdown(report.details) }}
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <h1>Responsible organisations</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bordered">
+                    <td colspan="2">
+                        <h2 title="Responsible party and Responsible party role">Responsible party</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h4>Contact position</h4></td>
+                    <td><p>Data Broker</p></td>
+                </tr>
+                <tr>
+                    <td><h4>Organisation name</h4></td>
+                    <td><p>{{ owner_org.title }}</p></td>
+                </tr>
+                {% set org_info = ['delivery', 'city', 'area', 'code', 'country', 'email'] %}
+                {% if owner_org.get('delivery') or owner_org.get('city') or owner_org.get('area') or owner_org.get('code') or owner_org.get('country') or owner_org.get('email') %}
+                    <tr>
+                        <td><h4>Full postal address</h4></td>
+                        <td>
+                            {% for field in org_info %}
+                                {% if owner_org.get(field) %}
+                                    <p>{{ owner_org.get(field) }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+                </tr>
+                {% if owner_org.get('voice') %}
+                    <tr>
+                        <td><h4>Telephone number</h4></td>
+                        <td><p>{{ owner_org.get('voice') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('fax') %}
+                    <tr>
+                        <td><h4>Facsimile number</h4></td>
+                        <td><p>{{ owner_org.get('fax') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('email') %}
+                    <tr>
+                        <td><h4>Email address</h4></td>
+                        <td><p><a href="mailto:{{ owner_org.get('email') }}">{{ owner_org.get('email') }}</a></p></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    {% if owner_org.get('website') %}
+                        <tr><td colpan="2"><h4>Web address</h4></td>
+                            <td><h3><a href="{{ owner_org.get('website') }}">{{ owner_org.get('website') }}</a></h3></td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td><h4>Responsible party role</h4></td>
+                        <td><p>pointOfContact</p></td>
+                    </tr>
+            </tbody>
+        </table>
+
+        <h1>Metadata on metadata</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bordered">
+                    <td colspan="2">
+                        <h2 title="Metadata point of contact">Metadata point of contact</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h4>Contact position</h4></td>
+                    <td><p>Data Broker</p></td>
+                </tr>
+                <tr>
+                    <td><h4>Organisation name</h4></td>
+                    <td><p>{{ owner_org.title }}</p></td>
+                </tr>
+                {% set org_info = ['delivery', 'city', 'area', 'code', 'country', 'email'] %}
+                {% if owner_org.get('delivery') or owner_org.get('city') or owner_org.get('area') or owner_org.get('code') or owner_org.get('country') or owner_org.get('email') %}
+                    <tr>
+                        <td><h4>Full postal address</h4></td>
+                        <td>
+                            {% for field in org_info %}
+                                {% if owner_org.get(field) %}
+                                    <p>{{ owner_org.get(field) }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+                </tr>
+                {% if owner_org.get('voice') %}
+                    <tr>
+                        <td><h4>Telephone number</h4></td>
+                        <td><p>{{ owner_org.get('voice') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('fax') %}
+                    <tr>
+                        <td><h4>Facsimile number</h4></td>
+                        <td><p>{{ owner_org.get('fax') }}</p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('email') %}
+                    <tr>
+                        <td><h4>Email address</h4></td>
+                        <td><p><a href="mailto:{{ owner_org.get('email') }}">{{ owner_org.get('email') }}</a></p></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td><h4>Responsible party role</h4></td>
+                    <td><p>distributor</p></td>
+                </tr>
+
+                <tr class="bordered">
+                    <td>
+                        <h2 title="Metadata date">Metadata date</h2>
+                    </td>
+                    <td>
+                        <p title="Metadata date">
+                            {{ h.change_date_time_display(date_stamp, '%Y-%m-%d',  '%Y-%m-%d') }}
+                        </p>
+                    </td>
+                </tr>
+
+                <tr class="bordered">
+                    <td>
+                        <h2 title="Metadata language">Metadata language</h2>
+                    </td>
+                    <td>
+                        <p>
+                            {{ language }}
+                        </p>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </body>
+</html>

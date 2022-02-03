@@ -1,0 +1,12 @@
+{#
+pkg
+label
+format
+#}
+
+{% set href = href or h.url_for('metaexport.export', id=pkg.name, format=format) %}
+{% set title = title or "Export metadata as " ~ format %}
+
+<a href="{{ href }}" class="metaexport-export-link {{ format }}-export-link" target="_blank" title="{{ title }}">
+    {{ label }}
+</a>

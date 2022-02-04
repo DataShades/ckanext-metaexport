@@ -222,10 +222,9 @@
                 <tr class="bordered">
                     <td><h2>Presentation form</h2></td>
                     <td>
-                        <!--TODO: humanize -->
                         {% if pkg_dict.get('presentation_form') %}
                             <p>
-                                {{ pkg_dict.get('presentation_form') }}
+                                {{ h.iso19115_option_label(pkg_dict.type, 'presentation_form', pkg_dict.presentation_form) }}
                             </p>
                         {% endif %}
                     </td>
@@ -244,9 +243,8 @@
                 <tr class="bordered">
                     <td><h2 title="Resource language">Dataset language</h2></td>
                     <td>
-                        <!--TODO: humanize -->
                         <p title="Dataset language">
-                            {{ pkg_dict.get('language') or 'eng' }}
+                            {{ h.iso19115_option_label(pkg_dict.type, 'language', pkg_dict.get("language") or "eng") }}
                         </p>
                     </td>
                 </tr>
@@ -295,13 +293,12 @@
                     </tr>
                 {% endif %}
 
-                <!--TODO: humanize -->
                 {% if pkg_dict.get('identification_status') %}
                     <tr class="bordered">
                         <td><h2>Status</h2></td>
                         <td>
                             <p>
-                                {{ pkg_dict.get('identification_status') }}
+                                {{ h.iso19115_option_label(pkg_dict.type, 'identification_status', pkg_dict.get('identification_status')) }}
                             </p>
                         </td>
                     </tr>
@@ -643,8 +640,10 @@
                 </tr>
                 <tr class="border-dot">
                     <td><h3>Maintenance and update frequency</h3></td>
-                    <!--TODO: humanize -->
-                    <td><p>{{ pkg_dict.get('update_freq') or pkg_dict.get("update_frequency") }}</p></td>
+                    {% set fn = "update_freq" if "update_freq" in pkg_dict else "update_frequency" %}
+                    <td><p>
+                        {{ h.iso19115_option_label(pkg_dict.type, fn, pkg_dict.get(fn)) }}
+                    </p></td>
                 </tr>
                 <tr><td colspan="2"><h3>Contact info</h3></td></tr>
                 <tr>
@@ -770,8 +769,7 @@
                         <tr class="bordered">
                             <td colspan="2">
                                 <h3>
-                                    <!--TODO: humanize-->
-                                    {{ report.type }}
+                                    {{ h.iso19115_option_label(pkg_dict.type, ["data_quality", "type"], report.type) }}
                                 </h3>
                             </td>
                         </tr>

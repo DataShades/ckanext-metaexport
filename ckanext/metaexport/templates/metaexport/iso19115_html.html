@@ -647,6 +647,10 @@
                 </tr>
                 <tr><td colspan="2"><h3>Contact info</h3></td></tr>
                 <tr>
+                    <td><h4>Contact position</h4></td>
+                    <td><p>Data Broker</p></td>
+                </tr>
+                <tr>
                     <td><h4>Organisation name</h4></td>
                     <td><p>{{ owner_org.get('title') or (h.get_organization(owner_org.get('org')) or {}).get('title') }}</p></td>
                 </tr>
@@ -686,6 +690,11 @@
                     <tr>
                         <td><h4>Email address</h4></td>
                         <td><p><a href="mailto:{{ owner_org.get('email') }}">{{ owner_org.get('email') }}</a></p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('website') %}
+                    <tr><td colpan="2"><h4>Web address</h4></td>
+                        <td><h3><a href="{{ owner_org.get('website') }}">{{ owner_org.get('website') }}</a></h3></td>
                     </tr>
                 {% endif %}
                 <tr>
@@ -912,6 +921,11 @@
                     <tr>
                         <td><h4>Email address</h4></td>
                         <td><p><a href="mailto:{{ owner_org.get('email') }}">{{ owner_org.get('email') }}</a></p></td>
+                    </tr>
+                {% endif %}
+                {% if owner_org.get('website') %}
+                    <tr><td colpan="2"><h4>Web address</h4></td>
+                        <td><h3><a href="{{ owner_org.get('website') }}">{{ owner_org.get('website') }}</a></h3></td>
                     </tr>
                 {% endif %}
                 <tr>

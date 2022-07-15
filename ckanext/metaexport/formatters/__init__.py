@@ -10,7 +10,7 @@ def _default_data_extractor(pkg_id):
     return dict(
         pkg_id=pkg_id,
         pkg_dict=pkg_dict,
-        owner_org=pkg_dict.get("organization", {}),
+        owner_org=tk.get_action("organization_show")({}, {"id": pkg_dict.get("owner_org")}),
         date_stamp=pkg_dict['metadata_modified']
     )
 

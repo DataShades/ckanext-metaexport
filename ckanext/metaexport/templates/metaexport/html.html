@@ -8,7 +8,7 @@
         <meta name="DC.subject" scheme="eGMS.IPSV" content="metadata">
         <meta name="DC.language" scheme="DCTERMS.ISO639-2" content="{{ pkg_dict.get('language') or 'eng' }}">
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700,400italic" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="{{ h.url_for_static('base/vendor/font-awesome/css/font-awesome.css', qualified=True) }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
         {% block html_styles %}
             <style>
@@ -138,7 +138,7 @@
         {% endblock %}
     </head>
     <body class="{% block body_classes%}{% endblock %}">
-        <a href="javascript:window.print()" class="btn print-btn"><i class="icon-print fa fa-print"></i> Print</a>
+        <a href="javascript:window.print()" class="btn print-btn"><i class="icon-print fa-solid fa-print"></i> Print</a>
         <h1>Identification</h1>
         <table>
             <thead>

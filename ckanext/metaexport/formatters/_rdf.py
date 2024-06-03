@@ -60,5 +60,5 @@ class RdfFormat(Format):
         self.bind_namespaces(g)
         if self._with_ref:
             self._dataset_ref = URIRef(self._dataset_url)
-            g.add((self._dataset_ref, RDF.type, DC.Description))
+            g.add((self._dataset_ref, RDF.type, DC.description))
         return g

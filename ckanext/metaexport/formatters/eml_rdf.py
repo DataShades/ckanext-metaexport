@@ -1,26 +1,12 @@
-# -*- coding: utf-8 -*-
-
-import json
-import re
-
-from geomet import wkt, InvalidGeoJSONException
-from rdflib import Literal, URIRef, BNode
-from rdflib.namespace import RDF, XSD, SKOS, DC
+from rdflib import BNode, Literal
+from rdflib.namespace import DC
 
 from ckanext.metaexport.formatters._rdf import RdfFormat
 from ckanext.metaexport.formatters.triple_helpers import (
-    get_triple_from_dict,
-    get_triples_from_dict,
-    get_list_triples_from_dict,
-    resource_uri,
-    CleanedURIRef,
-    LOCN,
-    GSP,
-    GEOJSON_IMT,
-    DCT,
-    XS,
     ADMS,
     DCAT,
+    DCT,
+    XS,
 )
 
 
@@ -33,7 +19,10 @@ class EmlRdfFormat(RdfFormat):
             ("delivery", "point"),
             ("city",),
             ("administrative", "area"),
-            ("postal", "code",),
+            (
+                "postal",
+                "code",
+            ),
             ("country",),
         )
 
@@ -84,9 +73,7 @@ class EmlRdfFormat(RdfFormat):
         result = BNode()
         for value in data.get("keyword"):
             self.g.add((result, DC.keyword, Literal(value)))
-        self.g.add(
-            (result, XS.keywordThesaurus, Literal(data["keyword_thesaurus"]))
-        )
+        self.g.add((result, XS.keywordThesaurus, Literal(data["keyword_thesaurus"])))
 
         return result
 
@@ -111,7 +98,7 @@ class EmlRdfFormat(RdfFormat):
                     result,
                     XS[type_ + "_coverage"],
                     getattr(self, "_" + type_)(value),
-                )
+                ),
             )
 
         return result
@@ -124,7 +111,7 @@ class EmlRdfFormat(RdfFormat):
                 result,
                 XS.geographicDescription,
                 Literal(data["geographic_description"]),
-            )
+            ),
         )
         c = BNode()
         self.g.add((result, XS.boundingCoordinates, c))
@@ -134,7 +121,7 @@ class EmlRdfFormat(RdfFormat):
                     c,
                     XS[side + "BoundingCoordinate"],
                     Literal(coords[side + "_bounding_coordinate"]),
-                )
+                ),
             )
         return result
 
@@ -161,9 +148,7 @@ class EmlRdfFormat(RdfFormat):
             for item in tc:
                 r = BNode()
                 self.g.add((result, XS.taxonomicClassification, r))
-                self.g.add(
-                    (r, XS.taxonRancValue, Literal(item["taxon_rank_value"]))
-                )
+                self.g.add((r, XS.taxonRancValue, Literal(item["taxon_rank_value"])))
                 tn = item.get("taxon_rank_name")
                 if tn:
                     self.g.add((r, XS.taxonRancName, Literal(tn)))
@@ -183,7 +168,7 @@ class EmlRdfFormat(RdfFormat):
                 result,
                 XS.maintenanceUpdateFrequency,
                 Literal(data["maintenance_update_frequency"]),
-            )
+            ),
         )
 
         return result
@@ -200,9 +185,7 @@ class EmlRdfFormat(RdfFormat):
             r = BNode()
             self.g.add((result, XS.sampling, r))
             self.g.add((r, XS.studyExtent, Literal(s["study_extent"])))
-            self.g.add(
-                (r, XS.samplingDescription, Literal(s["sampling_description"]))
-            )
+            self.g.add((r, XS.samplingDescription, Literal(s["sampling_description"])))
         return result
 
     def _project(self, data):
@@ -230,7 +213,7 @@ class EmlRdfFormat(RdfFormat):
                     r,
                     XS.citableClassificationSystem,
                     Literal(s["citable_classification_system"]),
-                )
+                ),
             )
             name = s.get("name")
             if name:

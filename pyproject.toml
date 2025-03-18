@@ -1,3 +1,133 @@
-[tool.black]
-line-length = 79
-experimental-string-processing = true
+[tool.ruff]
+target-version = "py38"
+
+[tool.ruff.lint]
+ignore = [
+  "RET503", # don't enforce return-None
+  "E712", # comparison to bool: violated by SQLAlchemy filters
+  "PLC1901", # simplify comparison to empty string: violated by SQLAlchemy filters
+  "E501", # we have a lot of long-line issues,
+  "PT004", # fixture does not return anything, add leading underscore: violated by clean_db
+]
+select = [
+  # "B",  # likely bugs and design problems
+  # "BLE",  # do not catch blind exception
+  # "C4",  # better list/set/dict comprehensions
+  # "C90",  # check McCabe complexity
+  "COM", # trailing commas
+  # "DTZ", # enforce timezone in date objects
+  "E", # pycodestyle error
+  # "W",  # pycodestyle warning
+  "F", # pyflakes
+  "G", # format strings for logging statements
+  # "N",  # naming conventions
+  # "PL",  # pylint
+  "PT", # pytest style
+  "PIE", # misc lints
+  "Q", # preferred quoting style
+  # "RET",  # improvements for return statements
+  "RSE", # improvements for rise statements
+  # "S",  # security testing
+  # "SIM",  # simplify code
+  "T10", # debugging statements
+  # "T20",  # print statements
+  "TID", # tidier imports
+  # "TRY",  # better exceptions
+  "UP", # upgrade syntax for newer versions of the language
+]
+
+[tool.ruff.lint.per-file-ignores]
+
+[tool.ruff.lint.flake8-import-conventions.aliases]
+"ckan.plugins" = "p"
+"ckan.plugins.toolkit" = "tk"
+sqlalchemy = "sa"
+
+[tool.isort]
+known_ckan = "ckan"
+known_ckanext = "ckanext"
+known_self = "ckanext.metaexport"
+sections = "FUTURE,STDLIB,FIRSTPARTY,THIRDPARTY,CKAN,CKANEXT,SELF,LOCALFOLDER"
+profile = "black"
+
+[tool.ruff.lint.isort.sections]
+ckan = ["ckan"]
+ckanext = ["ckanext"]
+self = ["ckanext.metaexport"]
+
+[tool.pytest.ini_options]
+addopts = "--ckan-ini test.ini"
+filterwarnings = [
+  "ignore::sqlalchemy.exc.SADeprecationWarning",
+  "ignore::sqlalchemy.exc.SAWarning",
+  "ignore::DeprecationWarning",
+]
+
+[tool.pyright]
+include = ["ckanext"]
+pythonVersion = "3.8"
+strict = []
+
+strictParameterNoneValue = true
+
+# Check the meaning of rules here
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+reportAssertAlwaysTrue = true
+reportCallInDefaultInitializer = true
+reportConstantRedefinition = true
+reportDuplicateImport = true
+reportFunctionMemberAccess = true # non-standard member accesses for functions
+reportGeneralTypeIssues = true
+reportImplicitStringConcatenation = false
+reportImportCycles = true
+reportIncompatibleMethodOverride = true
+reportIncompatibleVariableOverride = true
+reportIncompleteStub = true
+reportInconsistentConstructor = true
+reportInvalidStringEscapeSequence = true
+reportInvalidStubStatement = true
+reportInvalidTypeVarUse = true
+reportMatchNotExhaustive = true
+reportMissingImports = true
+reportMissingModuleSource = true
+reportMissingParameterType = true
+reportMissingSuperCall = false
+reportMissingTypeArgument = true
+reportMissingTypeStubs = false
+reportOptionalCall = true
+reportOptionalContextManager = true
+reportOptionalIterable = true
+reportOptionalMemberAccess = true
+reportOptionalOperand = true
+reportOptionalSubscript = true
+reportOverlappingOverload = true
+reportPrivateImportUsage = true
+reportPrivateUsage = true
+reportPropertyTypeMismatch = true
+reportSelfClsParameterName = true
+reportTypedDictNotRequiredAccess = false # Context won't work with this rule
+reportUnboundVariable = true
+reportUndefinedVariable = true
+reportUninitializedInstanceVariable = true
+reportUnknownArgumentType = false
+reportUnknownLambdaType = false
+reportUnknownMemberType = false
+reportUnknownParameterType = true
+reportUnknownVariableType = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUnnecessaryIsInstance = true
+reportUnnecessaryTypeIgnoreComment = true
+reportUnsupportedDunderAll = true
+reportUntypedBaseClass = true
+reportUntypedClassDecorator = false
+reportUntypedFunctionDecorator = false
+reportUntypedNamedTuple = true
+reportUnusedCallResult = false # allow function calls for side-effect only
+reportUnusedClass = true
+reportUnusedCoroutine = true
+reportUnusedFunction = true
+reportUnusedImport = true
+reportUnusedVariable = true
+reportWildcardImportFromLibrary = true
+useLibraryCodeForTypes = true

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 import ckan.lib.base as base
-import ckan.plugins.toolkit as tk
 import ckan.model as model
+import ckan.plugins.toolkit as tk
 
 
 def _default_data_extractor(pkg_id):
@@ -10,39 +9,37 @@ def _default_data_extractor(pkg_id):
     return dict(
         pkg_id=pkg_id,
         pkg_dict=pkg_dict,
-        owner_org=tk.get_action("organization_show")({}, {"id": pkg_dict.get("owner_org")}),
-        date_stamp=pkg_dict['metadata_modified']
+        owner_org=tk.get_action("organization_show")(
+            {}, {"id": pkg_dict.get("owner_org")},
+        ),
+        date_stamp=pkg_dict["metadata_modified"],
     )
 
 
-class Formatter(object):
-    """Potentially static class-collection of all supported formats.
-    """
+class Formatter:
+    """Potentially static class-collection of all supported formats."""
 
     _formats = dict()
 
     @classmethod
     def register(cls, **formats):
-        """Add new format(or replace old one).
-        """
+        """Add new format(or replace old one)."""
         cls._formats.update(formats)
 
     @classmethod
     def list_formats(cls):
-        """List all registered formats.
-        """
+        """List all registered formats."""
         return list(cls._formats.keys())
 
     @classmethod
     def get(cls, format):
-        """Return registered format or raise `NameError`
-        """
+        """Return registered format or raise `NameError`"""
         if format in cls._formats:
             return cls._formats[format]
         raise NameError(format)
 
 
-class Format(object):
+class Format:
     """Base formatter type.
 
     :prop _content_type: value of `Content-Type` header

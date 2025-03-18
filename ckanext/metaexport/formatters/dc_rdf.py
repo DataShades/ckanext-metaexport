@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
-
 import json
 
-from geomet import wkt, InvalidGeoJSONException
-from rdflib import Literal, URIRef, BNode
-from rdflib.namespace import RDF, XSD, SKOS, DC
+from geomet import InvalidGeoJSONException, wkt
+from rdflib import BNode, Literal, URIRef
+from rdflib.namespace import DC, RDF, SKOS, XSD
 
 from ckanext.metaexport.formatters._rdf import RdfFormat
 from ckanext.metaexport.formatters.triple_helpers import (
+    DCT,
+    GEOJSON_IMT,
+    GSP,
+    LOCN,
+    CleanedURIRef,
+    get_list_triples_from_dict,
     get_triple_from_dict,
     get_triples_from_dict,
-    get_list_triples_from_dict,
     resource_uri,
-    CleanedURIRef,
-    LOCN,
-    GSP,
-    GEOJSON_IMT,
-    DCT,
 )
 
 
@@ -31,7 +29,7 @@ class DcRdfFormat(RdfFormat):
         ]
 
         for triple in get_triples_from_dict(
-            self._dataset_dict, self._dataset_ref, items
+            self._dataset_dict, self._dataset_ref, items,
         ):
             g.add(triple)
         g.add((self._dataset_ref, DC.landingPage, URIRef(self._dataset_url)))
@@ -55,7 +53,7 @@ class DcRdfFormat(RdfFormat):
             ("rights", DC.rights, None, Literal),
         ]
         for triple in get_list_triples_from_dict(
-            self._dataset_dict, self._dataset_ref, items
+            self._dataset_dict, self._dataset_ref, items,
         ):
             g.add(triple)
 
@@ -64,7 +62,7 @@ class DcRdfFormat(RdfFormat):
             ("date", DC.date, None, Literal),
         ]
         for triple in get_list_triples_from_dict(
-            self._dataset_dict, self._dataset_ref, items
+            self._dataset_dict, self._dataset_ref, items,
         ):
             g.add(triple)
 
@@ -92,7 +90,7 @@ class DcRdfFormat(RdfFormat):
                         spatial_ref,
                         LOCN.geometry,
                         Literal(spatial_geom, datatype=GEOJSON_IMT),
-                    )
+                    ),
                 )
                 # WKT, because GeoDCAT-AP says so
                 try:
@@ -101,12 +99,10 @@ class DcRdfFormat(RdfFormat):
                             spatial_ref,
                             LOCN.geometry,
                             Literal(
-                                wkt.dumps(
-                                    json.loads(spatial_geom), decimals=4
-                                ),
+                                wkt.dumps(json.loads(spatial_geom), decimals=4),
                                 datatype=GSP.wktLiteral,
                             ),
-                        )
+                        ),
                     )
                 except (TypeError, ValueError, InvalidGeoJSONException):
                     pass
@@ -126,9 +122,7 @@ class DcRdfFormat(RdfFormat):
                 ("description", DC.description, None, Literal),
             ]
 
-            for triple in get_triples_from_dict(
-                resource_dict, distribution, items
-            ):
+            for triple in get_triples_from_dict(resource_dict, distribution, items):
                 g.add(triple)
 
             # Format
@@ -138,7 +132,7 @@ class DcRdfFormat(RdfFormat):
                         distribution,
                         DC.mediaType,
                         Literal(resource_dict["format"]),
-                    )
+                    ),
                 )
             else:
                 if resource_dict.get("format"):
@@ -147,7 +141,7 @@ class DcRdfFormat(RdfFormat):
                             distribution,
                             DC["format"],
                             Literal(resource_dict["format"]),
-                        )
+                        ),
                     )
 
                 if resource_dict.get("mimetype"):
@@ -156,7 +150,7 @@ class DcRdfFormat(RdfFormat):
                             distribution,
                             DC.mediaType,
                             Literal(resource_dict["mimetype"]),
-                        )
+                        ),
                     )
 
             # URL fallback and old behavior
@@ -182,7 +176,7 @@ class DcRdfFormat(RdfFormat):
                                 float(resource_dict["size"]),
                                 datatype=XSD.decimal,
                             ),
-                        )
+                        ),
                     )
                 except (ValueError, TypeError):
                     g.add(
@@ -190,7 +184,7 @@ class DcRdfFormat(RdfFormat):
                             distribution,
                             DC.byteSize,
                             Literal(resource_dict["size"]),
-                        )
+                        ),
                     )
 
         return {"data": g.serialize(format="pretty-xml")}

@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
+import logging
 
-from __future__ import print_function
+from flask import Blueprint, make_response
+
 import ckan.model as model
 import ckan.plugins.toolkit as tk
-import logging
-from flask import Blueprint, make_response
 
 from ckanext.metaexport.formatters import Formatter
 from ckanext.metaexport.helpers import metaex_get_top_org
-
 
 log = logging.getLogger(__name__)
 
@@ -23,8 +21,7 @@ def export(id, format):
     except tk.NotAuthorized:
         return tk.abort(
             403,
-            tk._("Not authorized to read dataset %s in %s format")
-            % (id, format),
+            tk._("Not authorized to read dataset %s in %s format") % (id, format),
         )
     except tk.ObjectNotFound:
         return tk.abort(404, tk._("%s does not exist") % (id))
@@ -40,13 +37,13 @@ def export(id, format):
         if "owner_org" in data:
             org = data["owner_org"]
             # Try to get parent Organization
-            parent_org = metaex_get_top_org(org["id"], True)
+            parent_org = metaex_get_top_org(org["id"])
             if parent_org:
                 org = parent_org
                 data["owner_org"] = org
     except Exception as e:
         print(e)
-    body = fmt.render("metaexport/{}.html".format(format), extra_vars=data)
+    body = fmt.render(f"metaexport/{format}.html", extra_vars=data)
     return make_response((body, headers))
 
 

@@ -14,14 +14,6 @@ All formats should be registered before using. In order to do this, perform next
 All export views are available under `/dataset/{id}/metaexport/{format}` URL.
 
 ------------
-Requirements
-------------
-
-For example, you might want to mention here which versions of CKAN this
-extension works with.
-
-
-------------
 Installation
 ------------
 
@@ -48,17 +40,6 @@ To install ckanext-metaexport:
      sudo service apache2 reload
 
 
----------------
-Config Settings
----------------
-
-Document any optional config settings here. For example::
-
-    # The minimum number of hours to wait before re-checking a resource
-    # (optional, default: 24).
-    ckanext.metaexport.some_setting = some_default_value
-
-
 ------------------------
 Development Installation
 ------------------------
@@ -70,75 +51,3 @@ do::
     cd ckanext-metaexport
     python setup.py develop
     pip install -r dev-requirements.txt
-
-
-
-
------------------
-Running the Tests
------------------
-
-To run the tests, do::
-
-    nosetests --nologcapture --with-pylons=test.ini
-
-To run the tests and produce a coverage report, first make sure you have
-coverage installed in your virtualenv (``pip install coverage``) then run::
-
-    nosetests --nologcapture --with-pylons=test.ini --with-coverage --cover-package=ckanext.metaexport --cover-inclusive --cover-erase --cover-tests
-
-
----------------------------------
-Registering ckanext-metaexport on PyPI
----------------------------------
-
-ckanext-metaexport should be availabe on PyPI as
-https://pypi.python.org/pypi/ckanext-metaexport. If that link doesn't work, then
-you can register the project on PyPI for the first time by following these
-steps:
-
-1. Create a source distribution of the project::
-
-     python setup.py sdist
-
-2. Register the project::
-
-     python setup.py register
-
-3. Upload the source distribution to PyPI::
-
-     python setup.py sdist upload
-
-4. Tag the first release of the project on GitHub with the version number from
-   the ``setup.py`` file. For example if the version number in ``setup.py`` is
-   0.0.1 then do::
-
-       git tag 0.0.1
-       git push --tags
-
-
-----------------------------------------
-Releasing a New Version of ckanext-metaexport
-----------------------------------------
-
-ckanext-metaexport is availabe on PyPI as https://pypi.python.org/pypi/ckanext-metaexport.
-To publish a new version to PyPI follow these steps:
-
-1. Update the version number in the ``setup.py`` file.
-   See `PEP 440 <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
-   for how to choose version numbers.
-
-2. Create a source distribution of the new version::
-
-     python setup.py sdist
-
-3. Upload the source distribution to PyPI::
-
-     python setup.py sdist upload
-
-4. Tag the new release of the project on GitHub with the version number from
-   the ``setup.py`` file. For example if the version number in ``setup.py`` is
-   0.0.2 then do::
-
-       git tag 0.0.2
-       git push --tags

@@ -1,33 +1,30 @@
-# -*- coding: utf-8 -*-
-
 import json
 
-from rdflib import Literal, URIRef, BNode
-from rdflib.namespace import RDF, XSD, SKOS
-
-from geomet import wkt, InvalidGeoJSONException
+from geomet import InvalidGeoJSONException, wkt
+from rdflib import BNode, Literal, URIRef
+from rdflib.namespace import RDF, SKOS, XSD
 
 from ckanext.metaexport.formatters._rdf import RdfFormat
 from ckanext.metaexport.formatters.triple_helpers import (
-    publisher_uri_from_dataset_dict,
-    get_date_triple,
-    get_triple_from_dict,
-    get_triples_from_dict,
-    get_list_triples_from_dict,
-    resource_uri,
+    ADMS,
+    DCAT,
+    DCT,
+    FOAF,
+    GEOJSON_IMT,
+    GSP,
+    LOCN,
+    OWL,
+    SCHEMA,
+    SPDX,
+    VCARD,
     CleanedURIRef,
     add_mailto,
-    DCT,
-    DCAT,
-    ADMS,
-    VCARD,
-    FOAF,
-    SCHEMA,
-    LOCN,
-    GSP,
-    OWL,
-    SPDX,
-    GEOJSON_IMT,
+    get_date_triple,
+    get_list_triples_from_dict,
+    get_triple_from_dict,
+    get_triples_from_dict,
+    publisher_uri_from_dataset_dict,
+    resource_uri,
 )
 
 
@@ -49,7 +46,7 @@ class DcatRdfFormat(RdfFormat):
             ("provenance", DCT.provenance, None, Literal),
         ]
         for triple in get_triples_from_dict(
-            self._dataset_dict, self._dataset_ref, items
+            self._dataset_dict, self._dataset_ref, items,
         ):
             g.add(triple)
         g.add((self._dataset_ref, DCAT.landingPage, URIRef(self._dataset_url)))
@@ -64,7 +61,7 @@ class DcatRdfFormat(RdfFormat):
             ("modified", DCT.modified, ["metadata_modified"], Literal),
         ]
         for triple in get_triples_from_dict(
-            self._dataset_dict, self._dataset_ref, items, date_value=True
+            self._dataset_dict, self._dataset_ref, items, date_value=True,
         ):
             g.add(triple)
 
@@ -75,15 +72,13 @@ class DcatRdfFormat(RdfFormat):
             ("conforms_to", DCT.conformsTo, None, Literal),
             ("alternate_identifier", ADMS.identifier, None, Literal),
             ("documentation", FOAF.page, None, Literal),
-            # TODO: why we dont have this field?
-            # ('related_resource', DCT.relation, None, Literal),
             ("has_version", DCT.hasVersion, None, Literal),
             ("is_version_of", DCT.isVersionOf, None, Literal),
             ("source", DCT.source, None, Literal),
             ("sample", ADMS.sample, None, Literal),
         ]
         for triple in get_list_triples_from_dict(
-            self._dataset_dict, self._dataset_ref, items
+            self._dataset_dict, self._dataset_ref, items,
         ):
             g.add(triple)
 
@@ -132,7 +127,11 @@ class DcatRdfFormat(RdfFormat):
         # Publisher
         if any(
             self._dataset_dict.get(field)
-            for field in ["publisher_uri", "publisher_name", "organization",]
+            for field in [
+                "publisher_uri",
+                "publisher_name",
+                "organization",
+            ]
         ):
 
             publisher_uri = publisher_uri_from_dataset_dict(self._dataset_dict)
@@ -161,7 +160,7 @@ class DcatRdfFormat(RdfFormat):
             ]
 
             for triple in get_triples_from_dict(
-                self._dataset_dict, publisher_details, items
+                self._dataset_dict, publisher_details, items,
             ):
                 g.add(triple)
 
@@ -173,9 +172,7 @@ class DcatRdfFormat(RdfFormat):
 
             g.add((temporal_extent, RDF.type, DCT.PeriodOfTime))
             if start:
-                g.add(
-                    get_date_triple(temporal_extent, SCHEMA.startDate, start)
-                )
+                g.add(get_date_triple(temporal_extent, SCHEMA.startDate, start))
             if end:
                 g.add(get_date_triple(temporal_extent, SCHEMA.endDate, end))
             g.add((self._dataset_ref, DCT.temporal, temporal_extent))
@@ -204,7 +201,7 @@ class DcatRdfFormat(RdfFormat):
                         spatial_ref,
                         LOCN.geometry,
                         Literal(spatial_geom, datatype=GEOJSON_IMT),
-                    )
+                    ),
                 )
                 # WKT, because GeoDCAT-AP says so
                 try:
@@ -213,12 +210,10 @@ class DcatRdfFormat(RdfFormat):
                             spatial_ref,
                             LOCN.geometry,
                             Literal(
-                                wkt.dumps(
-                                    json.loads(spatial_geom), decimals=4
-                                ),
+                                wkt.dumps(json.loads(spatial_geom), decimals=4),
                                 datatype=GSP.wktLiteral,
                             ),
-                        )
+                        ),
                     )
                 except (TypeError, ValueError, InvalidGeoJSONException):
                     pass
@@ -244,9 +239,7 @@ class DcatRdfFormat(RdfFormat):
                 ("download_url", DCAT.downloadURL, None, URIRef),
             ]
 
-            for triple in get_triples_from_dict(
-                resource_dict, distribution, items
-            ):
+            for triple in get_triples_from_dict(resource_dict, distribution, items):
                 g.add(triple)
 
             #  Lists
@@ -256,7 +249,7 @@ class DcatRdfFormat(RdfFormat):
                 ("conforms_to", DCT.conformsTo, None, Literal),
             ]
             for triple in get_list_triples_from_dict(
-                resource_dict, distribution, items
+                resource_dict, distribution, items,
             ):
                 g.add(triple)
 
@@ -267,7 +260,7 @@ class DcatRdfFormat(RdfFormat):
                         distribution,
                         DCAT.mediaType,
                         Literal(resource_dict["format"]),
-                    )
+                    ),
                 )
             else:
                 if resource_dict.get("format"):
@@ -276,7 +269,7 @@ class DcatRdfFormat(RdfFormat):
                             distribution,
                             DCT["format"],
                             Literal(resource_dict["format"]),
-                        )
+                        ),
                     )
 
                 if resource_dict.get("mimetype"):
@@ -285,7 +278,7 @@ class DcatRdfFormat(RdfFormat):
                             distribution,
                             DCAT.mediaType,
                             Literal(resource_dict["mimetype"]),
-                        )
+                        ),
                     )
 
             # URL fallback and old behavior
@@ -295,9 +288,7 @@ class DcatRdfFormat(RdfFormat):
             # Use url as fallback for access_url if access_url is not
             # set and download_url is not equal
             if url and not access_url:
-                if (not download_url) or (
-                    download_url and url != download_url
-                ):
+                if (not download_url) or (download_url and url != download_url):
                     for triple in get_triple_from_dict(
                         resource_dict,
                         distribution,
@@ -314,7 +305,7 @@ class DcatRdfFormat(RdfFormat):
             ]
 
             for triple in get_triples_from_dict(
-                resource_dict, distribution, items, date_value=True
+                resource_dict, distribution, items, date_value=True,
             ):
                 g.add(triple)
 
@@ -329,7 +320,7 @@ class DcatRdfFormat(RdfFormat):
                                 float(resource_dict["size"]),
                                 datatype=XSD.decimal,
                             ),
-                        )
+                        ),
                     )
                 except (ValueError, TypeError):
                     g.add(
@@ -337,7 +328,7 @@ class DcatRdfFormat(RdfFormat):
                             distribution,
                             DCAT.byteSize,
                             Literal(resource_dict["size"]),
-                        )
+                        ),
                     )
             # Checksum
             if resource_dict.get("hash"):
@@ -348,7 +339,7 @@ class DcatRdfFormat(RdfFormat):
                         checksum,
                         SPDX.checksumValue,
                         Literal(resource_dict["hash"], datatype=XSD.hexBinary),
-                    )
+                    ),
                 )
 
                 if resource_dict.get("hash_algorithm"):
@@ -358,7 +349,7 @@ class DcatRdfFormat(RdfFormat):
                                 checksum,
                                 SPDX.algorithm,
                                 CleanedURIRef(resource_dict["hash_algorithm"]),
-                            )
+                            ),
                         )
                     else:
                         g.add(
@@ -366,9 +357,8 @@ class DcatRdfFormat(RdfFormat):
                                 checksum,
                                 SPDX.algorithm,
                                 Literal(resource_dict["hash_algorithm"]),
-                            )
+                            ),
                         )
                 g.add((distribution, SPDX.checksum, checksum))
 
-        # graph.add((dataset. RDF.about , Literal()))
         return {"data": g.serialize(format="pretty-xml")}

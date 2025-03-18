@@ -177,17 +177,6 @@
                     </td>
                 </tr>
 
-                <!--         <xsl:if test="gmd:hierarchyLevel">
-                     <tr class="bordered">
-                     <td><h2 title="Resource type">Resource type</h2></td>
-                     <td>
-                     <p title="Resource type">
-                     <xsl:value-of select="gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue"/>
-                     </p>
-                     </td>
-                     </tr>
-                     </xsl:if> -->
-
                 <!-- new in 1.0b -->
                 <tr title="Resource locator" class="bordered border-dot">
                     <td colspan="2"><h2 title="Resource locator">Resource locator</h2></td>
@@ -571,34 +560,6 @@
                 {% endif %}
 
                 <!-- section break -->
-                <!--       <xsl:if test="gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription">
-                     <tr class="bordered border-dot">
-                     <td><h2>Extent</h2></td>
-                     </tr>
-                     <xsl:for-each select="gmd:identificationInfo/*/*/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription">
-                     <tr class="border-dot">
-                     <td><h3>Extent group</h3></td>
-                     </tr>
-                     <tr>
-                     <td><h4>Authority code</h4></td>
-                     <td>
-                     <p title="Extent: authority">
-                     <xsl:apply-templates select="gmd:geographicIdentifier/gmd:MD_Identifier/gmd:authority/gmd:CI_Citation"/>
-                     </p>
-                     </td>
-                     </tr>
-                     <tr>
-                     <td><h4>Code identifying the extent</h4></td>
-                     <td>
-                     <p title="Extent: code">
-                     <xsl:value-of select="gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString"/>
-                     </p>
-                     </td>
-                     </tr>
-                     </xsl:for-each>
-                     </xsl:if> -->
-
-                <!-- section break -->
 
                 {% set vex = h.meta_undump(pkg_dict.get('vertical_extent') or '{}') %}
                 <tr class="bordered border-dot">
@@ -643,7 +604,6 @@
                 <!-- section break -->
                 <tr class="bordered border-dot">
                     <td colspan="2">
-                        <!-- <h1>Temporal reference</h1> -->
                         <h2 title="Temporal extent">Temporal extent</h2>
                     </td>
                 </tr>

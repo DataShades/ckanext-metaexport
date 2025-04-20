@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import datetime
 import json
 import logging
 import uuid
-from typing import Any, Callable, Generator, Iterator
+from typing import Any, Callable
+from collections.abc import Generator, Iterator
 from urllib.parse import quote
 
 from dateutil.parser import parse as parse_date

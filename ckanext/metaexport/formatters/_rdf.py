@@ -46,7 +46,7 @@ class RdfFormat(Format):
 
     def _init_graph(self, id):
         self._dataset_dict = tk.get_action("package_show")(
-            {"user": tk.current_user, "model": model}, {"id": id},
+            {"user": tk.current_user.name, "model": model}, {"id": id},
         )
 
         self._dataset_url = h.url_for(

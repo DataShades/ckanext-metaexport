@@ -3,7 +3,7 @@ import json
 import logging
 from datetime import datetime
 from typing import Any
-from bleach import clean as bleach_clean
+from nh3 import clean_text
 from dateutil.parser import parse
 from dateutil.tz import tzlocal
 
@@ -174,4 +174,4 @@ def metaex_clean_html(text: str) -> str:
     Returns:
         The cleaned html string.
     """
-    return bleach_clean(text, tags=[], strip=True)
+    return clean_text(text, tags={""})

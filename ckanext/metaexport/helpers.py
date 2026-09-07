@@ -3,12 +3,21 @@ import json
 import logging
 from datetime import datetime
 from typing import Any
-from nh3 import clean_text
+
+
 from dateutil.parser import parse
 from dateutil.tz import tzlocal
 
 import ckan.logic as logic
 import ckan.model as model
+
+import ckan.plugins.toolkit as tk
+
+if tk.check_ckan_version("2.12"):
+    from nh3 import clean
+else:
+    from bleach import clean
+
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +60,9 @@ def coordinate_format(coordinate: float) -> str:
 
 
 def metaexport_iso_date_with_tz(
-    date: str, with_time: bool = True, to_zero: bool = False,
+    date: str,
+    with_time: bool = True,
+    to_zero: bool = False,
 ) -> str:
     """
     Get the ISO date with the timezone.
@@ -97,7 +108,9 @@ def dataset_references_dates(data: dict[str, Any]) -> list[tuple[str, str]]:
 
 
 def change_date_time_display(
-    date_time: str, current_pattern: str, new_pattern: str,
+    date_time: str,
+    current_pattern: str,
+    new_pattern: str,
 ) -> str:
     """
     Change the date time display to the new pattern.
@@ -174,4 +187,7 @@ def metaex_clean_html(text: str) -> str:
     Returns:
         The cleaned html string.
     """
-    return clean_text(text, tags={""})
+    if tk.check_ckan_version("2.12"):
+        return clean(text, tags={""})
+
+    return clean(text, tags=[], strip=True)
